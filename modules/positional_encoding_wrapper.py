@@ -54,10 +54,15 @@ def apply_rotary_emb(freqs, to_be_rotated, demographic_info=None, start_index=0,
     age, gender = demographic_info[:, 0], demographic_info[:, 1]
     freqs_cos = age.view(len(age), 1, 1) * freqs.cos() + gender.view(len(gender), 1, 1)
     freqs_sin = age.view(len(age), 1, 1) * freqs.sin() + gender.view(len(gender), 1, 1)
-    freqs_cos = freqs_cos.unsqueeze(1).repeat(1, to_be_rotated.shape[1], 1, 1)
-    freqs_sin = freqs_sin.unsqueeze(1).repeat(1, to_be_rotated.shape[1], 1, 1)
-
     assert rot_dim <= to_be_rotated.shape[-1], f'feature dimension {to_be_rotated.shape[-1]} is not of sufficient size to rotate in all the positions {rot_dim}'
+
+    # Align `freqs_cos` to `to_be_rotated` shape without failing when num_freqs mismatch due to single-band mode
+    if freqs_cos.ndim == 3: # usually (batch, 1, rot_dim)
+        freqs_cos = freqs_cos.unsqueeze(1).expand(-1, to_be_rotated.shape[1], -1, -1)
+        freqs_sin = freqs_sin.unsqueeze(1).expand(-1, to_be_rotated.shape[1], -1, -1)
+    elif freqs_cos.ndim == 4: 
+        freqs_cos = freqs_cos[:, :to_be_rotated.shape[1], :, :]
+        freqs_sin = freqs_sin[:, :to_be_rotated.shape[1], :, :]
 
     t_left, t, t_right = to_be_rotated[..., :start_index], to_be_rotated[..., start_index:end_index], to_be_rotated[..., end_index:]
     t = (t * freqs_cos * scale) + (rotate_every_two(t) * freqs_sin * scale)
@@ -223,6 +228,10 @@ class dRoFE(nn.Module):
 
         if should_cache:
             self.tmp_store('cached_freqs', freqs_2D.detach())
+
+        # Align to target sequence length (handles single-band datasets like BEED seamlessly)
+        if freqs_2D.shape[-2] > to_be_rotated_q.shape[-2]:
+            freqs_2D = freqs_2D[..., :to_be_rotated_q.shape[-2], :]
 
         rotated_q = apply_rotary_emb(freqs_2D, to_be_rotated_q, demographic_info, seq_dim=seq_dim)
         rotated_k = apply_rotary_emb(freqs_2D, to_be_rotated_k, demographic_info, seq_dim=seq_dim)

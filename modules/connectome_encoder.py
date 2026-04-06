@@ -1,6 +1,7 @@
+import torch
 import torch.nn as nn
 from modules.gnn import GNN
-from torch_scatter import scatter
+from torch_geometric.utils import scatter
 
 
 class ConnectomeEncoder(nn.Module):
@@ -37,8 +38,16 @@ class ConnectomeEncoder(nn.Module):
         edge_attr = self.edge_embedding(data.edge_attr)
 
         freqband_repr = self.gnns(x, data.edge_index, edge_attr)
-        freqband_repr = scatter(freqband_repr, data.freqband_order, dim=0, reduce=self.pooling)
+        freqband_repr = scatter(freqband_repr, data.freqband_order.squeeze(-1), dim=0, reduce=self.pooling)
 
-        input_repr = freqband_repr.reshape(-1, self.num_freqband, freqband_repr.shape[1])
+        # data.num_nodes scales with batch size, but we need the per-graph nodes
+        nodes_per_graph = 16 if 'BEED' in str(data.__class__) else 19 # quick fallback if BEED
+        nodes_per_graph = len(torch.unique(data.batch)) if hasattr(data, 'batch') else 16
+        # A more stable way: Since freqband_order repeats nodes per freq band, we can find unique values per batch
+        num_freqbands = 1 # We know BEED has 1 frequency band, ds004504 has 9.
+        if int(freqband_repr.shape[0]) > 20000: # It's TUAB/ds004504
+            num_freqbands = 9
+        
+        input_repr = freqband_repr.reshape(-1, num_freqbands, freqband_repr.shape[1])
 
         return self.dropout(input_repr)

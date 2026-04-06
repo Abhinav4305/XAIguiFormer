@@ -11,7 +11,7 @@ import numpy as np
 from timm.layers import RmsNorm
 from data.transform import Mixup
 from logger import create_logger
-from torch_scatter import scatter
+from torch_geometric.utils import scatter
 from timm.utils import AverageMeter
 from config import get_cfg_defaults
 from modules.activation import GeGLU
@@ -113,7 +113,7 @@ def main(cfg):
 
         if cfg.dataset == 'TDBRAIN':
             perf = val_sensitivity
-        elif cfg.dataset == 'TUAB':
+        elif cfg.dataset in ('TUAB', 'ds004504', 'BEED'):
             perf = val_bac
         # update the performance
         if epoch >= cfg.train.epochs/2 and max_perf <= perf:
@@ -163,16 +163,22 @@ def train(model, criterion, data_loader, optimizer, lr_scheduler, epoch, mixup, 
         get_local.clear()
         data = data.to(device)
 
-        if mixup is not None:
-            y_true = data.y
+        y_true = data.y
+        if mixup is not None and cfg.aug.mixup_prob > 0:
             data = mixup(data)
 
         optimizer.zero_grad()
         out = model(data)
         if len(out) > 1:
-            loss = (1 - cfg.train.criterion.alpha) * criterion(out[0], data.y) + cfg.train.criterion.alpha * criterion(out[1], data.y)
+            if mixup is not None and cfg.aug.mixup_prob > 0:
+                loss = (1 - cfg.train.criterion.alpha) * criterion(out[0], data.y) + cfg.train.criterion.alpha * criterion(out[1], data.y)
+            else:
+                loss = (1 - cfg.train.criterion.alpha) * criterion(out[0], torch.argmax(data.y, dim=-1)) + cfg.train.criterion.alpha * criterion(out[1], torch.argmax(data.y, dim=-1))
         else:
-            loss = criterion(out[0], data.y)
+            if mixup is not None and cfg.aug.mixup_prob > 0:
+                loss = criterion(out[0], data.y)
+            else:
+                loss = criterion(out[0], torch.argmax(data.y, dim=-1))
         loss.backward()
         optimizer.step()
 
@@ -218,12 +224,17 @@ def validate(model, criterion, data_loader, device, cfg):
 
     start = time.time()
     eids, outs, epoch_y = [], [], []
+    all_contributions = []
     for batch, data in enumerate(data_loader):
         get_local.clear()
         eids.extend(data.eid)
         data.to(device)
         outs.append(model(data))
         epoch_y.append(data.y)
+
+        # Capture XAI frequency band contributions from the forward pass
+        if 'XAIguiFormer.forward' in get_local.cache and len(get_local.cache['XAIguiFormer.forward']) > 0:
+            all_contributions.extend(get_local.cache['XAIguiFormer.forward'][-1])
     out = torch.cat([torch.stack(single_out) for single_out in outs], dim=1)
     epoch_y = torch.cat(epoch_y, dim=0)
 
@@ -238,8 +249,8 @@ def validate(model, criterion, data_loader, device, cfg):
     sub_group = sub_group.to(device)
 
     # ensemble the output probability by mean
-    out = scatter(out, sub_group.unsqueeze(0), dim=1, reduce='mean')
-    target = scatter(epoch_y.unsqueeze(1), sub_group, dim=0, reduce='mean').squeeze()
+    out = scatter(out, sub_group.squeeze(-1), dim=1, reduce='mean')
+    target = scatter(epoch_y.unsqueeze(1), sub_group.squeeze(-1), dim=0, reduce='mean').squeeze()
 
     # measure performance and record loss
     if len(out) > 1:
@@ -262,6 +273,21 @@ def validate(model, criterion, data_loader, device, cfg):
         f'balanced accuracy {bac * 100:.2f}%\t' +
         f'mem {memory_used:.0f}MB'
     )
+    
+    if len(all_contributions) > 0:
+        # all_contributions is a list of arrays of shape (num_freqband, embedding_dim)
+        # We take the mean of the absolute attributions across all batches and embedding dimensions
+        contrib_array = np.array(all_contributions)
+        if contrib_array.ndim == 3:
+            mean_contribution = np.abs(contrib_array).mean(axis=(0, 2))
+        else:
+            mean_contribution = np.abs(contrib_array).mean(axis=0)
+            
+        # Match contributions to the frequency bands (delta, theta, low_alpha, high_alpha, low_beta, mid_beta, high_beta, gamma, beta->tbr)
+        bands = ['delta', 'theta', 'low_alpha', 'high_alpha', 'low_beta', 'mid_beta', 'high_beta', 'gamma', 'theta/beta']
+        formatted_contribs = ' | '.join(f"{b}: {float(c):.4f}" for b, c in zip(bands, mean_contribution))
+        logger.info(f"XAI Frequency Band Contributions (Average Importance):\n  {formatted_contribs}")
+        
     logger.info('#' * 60)
 
     return bac, sensitivity, aucpr, auroc, loss
@@ -278,10 +304,10 @@ if __name__ == '__main__':
 
     # get the dataset from command line in order to train the model more flexible
     def check_dataset(dataset):
-        if dataset in ['TDBRAIN', 'TUAB']:
+        if dataset in ['TDBRAIN', 'TUAB', 'ds004504', 'BEED']:
             return dataset
         else:
-            raise argparse.ArgumentTypeError("Dataset must be TDBRAIN or TUAB")
+            raise argparse.ArgumentTypeError("Dataset must be TDBRAIN, TUAB, ds004504, or BEED")
 
     parser = argparse.ArgumentParser('XAIguiFormer training and evaluation script', add_help=False)
     parser.add_argument('--dataset', type=check_dataset, default='TDBRAIN', help='dataset name')
@@ -293,6 +319,10 @@ if __name__ == '__main__':
         cfg.merge_from_file('configs/TDBRAIN_model.yaml')
     elif args.dataset == 'TUAB':
         cfg.merge_from_file('configs/TUAB_model.yaml')
+    elif args.dataset == 'ds004504':
+        cfg.merge_from_file('configs/ds004504_model.yaml')
+    elif args.dataset == 'BEED':
+        cfg.merge_from_file('configs/BEED_model.yaml')
     cfg.freeze()
 
     # create tensorboard writer and logger

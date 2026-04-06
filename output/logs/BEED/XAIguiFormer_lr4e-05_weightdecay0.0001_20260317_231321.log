@@ -1,0 +1,240 @@
+[2026-03-17 23:13:21 - logger] - (main.py - 330): INFO - aug:
+  cutmix: 0.0
+  cutmix_minmax: null
+  mixup: 0.0
+  mixup_mode: batch
+  mixup_prob: 0.0
+  mixup_switch_prob: 0.0
+connectome:
+  frequency_band:
+    beta:
+    - 12.0
+    - 30.0
+    delta:
+    - 2.0
+    - 4.0
+    gamma:
+    - 30.0
+    - 45.0
+    high_alpha:
+    - 10.0
+    - 12.0
+    high_beta:
+    - 21.0
+    - 30.0
+    low_alpha:
+    - 8.0
+    - 10.0
+    low_beta:
+    - 12.0
+    - 18.0
+    mid_beta:
+    - 18.0
+    - 21.0
+    theta:
+    - 4.0
+    - 8.0
+  methods:
+  - coh
+  - wpli
+  path:
+    data_dir: <preprocessed-path-to-preprocessed-data>
+    save_dir: <save-path-to-connectome>
+dataset: BEED
+model:
+  attn_drop: 0.0
+  dim_edge_feat: 128
+  dim_node_feat: 128
+  dropout: 0.0
+  droppath: 0.0
+  explainer_type: DeepLift
+  gnn_type: GINEConv
+  init_values: 0.001
+  mlp_ratio: 4.0
+  num_classes: 2
+  num_edge_feat: 1
+  num_gnn_layer: 4
+  num_head: 4
+  num_node_feat: 16
+  num_transformer_layer: 6
+model_name: XAIguiFormer
+num_workers: 2
+out_root: output
+preprocessing:
+  h_freq: 45
+  ica:
+    fit_params:
+      extended: true
+    ic_label_threshold: 0.0
+    method: infomax
+    n_components: 20
+  l_freq: 1
+  line_frequency: 60
+  n_jobs: null
+  n_workers: 4
+  path:
+    data_dir: <path-to-raw-dataset>
+    electrode_locations: <file-path-to-elec_loc.csv>
+    save_dir: <save-path-to-preprocesses-data>
+pretrain: false
+pretrained_model: ''
+print_freq: 5
+root: EEGBenchmarkDataset
+save_fname: XAIguiFormer_lr4e-05_weightdecay0.0001_20260317_231321
+seed: 42
+train:
+  batch_size: 128
+  criterion:
+    alpha: 0.7
+    smoothing: 0.1
+  epochs: 50
+  lr_scheduler:
+    lr_min: 1.0e-07
+    warmup_epochs: 3
+    warmup_lr: 1.0e-07
+  optimizer:
+    betas:
+    - 0.9
+    - 0.99
+    eps: 1.0e-08
+    lr: 4.0e-05
+    weight_decay: 0.0001
+
+[2026-03-17 23:13:22 - logger] - (main.py - 60): INFO - Creating model:
+
+[2026-03-17 23:13:22 - logger] - (main.py - 85): INFO - XAIguiFormer(
+  (ConnectomeEncoder): ConnectomeEncoder(
+    (node_embedding): Linear(in_features=16, out_features=128, bias=True)
+    (edge_embedding): Linear(in_features=1, out_features=128, bias=True)
+    (gnns): GNN(
+      (convs): ModuleList(
+        (0-3): 4 x GINEConv(
+          (MLP): MLP(
+            (fcs): ModuleList(
+              (0-1): 2 x Linear(in_features=128, out_features=128, bias=True)
+            )
+            (norms): ModuleList(
+              (0-1): 2 x Identity()
+            )
+            (act_funcs): ModuleList(
+              (0-1): 2 x GELU(approximate='none')
+            )
+            (dropouts): ModuleList(
+              (0-1): 2 x Dropout(p=0.0, inplace=False)
+            )
+          )
+          (layer): GINEConv(nn=MLP(
+            (fcs): ModuleList(
+              (0-1): 2 x Linear(in_features=128, out_features=128, bias=True)
+            )
+            (norms): ModuleList(
+              (0-1): 2 x Identity()
+            )
+            (act_funcs): ModuleList(
+              (0-1): 2 x GELU(approximate='none')
+            )
+            (dropouts): ModuleList(
+              (0-1): 2 x Dropout(p=0.0, inplace=False)
+            )
+          ))
+        )
+      )
+      (norms): ModuleList(
+        (0-3): 4 x RmsNorm()
+      )
+      (act_funcs): ModuleList(
+        (0-3): 4 x GeGLU()
+      )
+      (projs): ModuleList(
+        (0-3): 4 x Linear(in_features=128, out_features=256, bias=True)
+      )
+      (dropouts): ModuleList(
+        (0-3): 4 x Dropout(p=0.0, inplace=False)
+      )
+      (output_embedding): Linear(in_features=128, out_features=128, bias=True)
+    )
+    (dropout): Dropout(p=0.0, inplace=False)
+  )
+  (TransformerEncoder): XAIguiTransformerEncoder(
+    (TransformerEncoder): ModuleList(
+      (0-5): 6 x XAIguiTransformerEncoderLayer(
+        (norm1): RmsNorm()
+        (attn): XAIguiAttention(
+          (qkv): Linear(in_features=128, out_features=384, bias=True)
+          (attn_drop): Dropout(p=0.0, inplace=False)
+          (proj): Linear(in_features=128, out_features=128, bias=True)
+          (proj_drop): Dropout(p=0.0, inplace=False)
+          (rope2D): dRoFE()
+        )
+        (ls1): LayerScale()
+        (drop_path1): Identity()
+        (norm2): RmsNorm()
+        (mlp): MLP(
+          (fcs): ModuleList(
+            (0): Linear(in_features=128, out_features=1024, bias=True)
+            (1): Linear(in_features=512, out_features=128, bias=True)
+          )
+          (norms): ModuleList(
+            (0-1): 2 x Identity()
+          )
+          (act_funcs): ModuleList(
+            (0-1): 2 x GeGLU()
+          )
+          (dropouts): ModuleList(
+            (0-1): 2 x Dropout(p=0.0, inplace=False)
+          )
+        )
+        (ls2): LayerScale()
+        (drop_path2): Identity()
+      )
+    )
+    (avgpool): AvgPool()
+    (head): MLP(
+      (fcs): ModuleList(
+        (0): Linear(in_features=128, out_features=256, bias=True)
+        (1): Linear(in_features=128, out_features=2, bias=True)
+      )
+      (norms): ModuleList(
+        (0-1): 2 x Identity()
+      )
+      (act_funcs): ModuleList(
+        (0-1): 2 x GeGLU()
+      )
+      (dropouts): ModuleList(
+        (0-1): 2 x Dropout(p=0.0, inplace=False)
+      )
+    )
+  )
+  (explainer): Explainer(
+    (explainer): DeepLift()
+  )
+)
+[2026-03-17 23:13:22 - logger] - (main.py - 107): INFO - ----------------------------------- Start training -----------------------------------
+[2026-03-17 23:13:26 - logger] - (main.py - 199): INFO - Train: [1/50][1/42]	lr 0.000000	 wd 0.0001	loss 0.6761 (0.6761)	balanced accuracy 69.65%	mem 0MB
+[2026-03-17 23:13:27 - logger] - (main.py - 199): INFO - Train: [1/50][6/42]	lr 0.000001	 wd 0.0001	loss 0.6747 (0.6716)	balanced accuracy 71.88%	mem 0MB
+[2026-03-17 23:13:28 - logger] - (main.py - 199): INFO - Train: [1/50][11/42]	lr 0.000003	 wd 0.0001	loss 0.6659 (0.6689)	balanced accuracy 74.62%	mem 0MB
+[2026-03-17 23:13:30 - logger] - (main.py - 199): INFO - Train: [1/50][16/42]	lr 0.000005	 wd 0.0001	loss 0.6519 (0.6672)	balanced accuracy 77.44%	mem 0MB
+[2026-03-17 23:13:32 - logger] - (main.py - 199): INFO - Train: [1/50][21/42]	lr 0.000006	 wd 0.0001	loss 0.6472 (0.6643)	balanced accuracy 75.00%	mem 0MB
+[2026-03-17 23:13:33 - logger] - (main.py - 199): INFO - Train: [1/50][26/42]	lr 0.000008	 wd 0.0001	loss 0.6318 (0.6591)	balanced accuracy 82.43%	mem 0MB
+[2026-03-17 23:13:35 - logger] - (main.py - 199): INFO - Train: [1/50][31/42]	lr 0.000009	 wd 0.0001	loss 0.6265 (0.6524)	balanced accuracy 79.07%	mem 0MB
+[2026-03-17 23:13:37 - logger] - (main.py - 199): INFO - Train: [1/50][36/42]	lr 0.000011	 wd 0.0001	loss 0.5663 (0.6439)	balanced accuracy 91.94%	mem 0MB
+[2026-03-17 23:13:38 - logger] - (main.py - 199): INFO - Train: [1/50][41/42]	lr 0.000012	 wd 0.0001	loss 0.5506 (0.6350)	balanced accuracy 89.82%	mem 0MB
+[2026-03-17 23:13:40 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:13:40 - logger] - (main.py - 214): INFO - EPOCH 1: train balanced accuracy 77.52% train takes 0:00:17
+[2026-03-17 23:13:40 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:13:51 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:13:51 - logger] - (main.py - 269): INFO - Test: 
+time 11.186	loss 0.5551	balanced accuracy 87.56%	mem 0MB
+[2026-03-17 23:13:51 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0098
+[2026-03-17 23:13:51 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:13:51 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:13:51 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:13:51 - logger] - (main.py - 127): INFO - Epoch: 001
+train balanced accuracy: 77.52%, sensitivity: 77.52%, aucpr: 0.7900, auroc: 0.8449, loss: 0.6332
+val balanced accuracy: 87.56%, sensitivity: 87.56%, aucpr: 0.9293, auroc: 0.9580, loss: 0.5551
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:13:51 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:13:54 - logger] - (main.py - 199): INFO - Train: [2/50][1/42]	lr 0.000013	 wd 0.0001	loss 0.5620 (0.5620)	balanced accuracy 82.79%	mem 0MB
+[2026-03-17 23:13:56 - logger] - (main.py - 199): INFO - Train: [2/50][6/42]	lr 0.000015	 wd 0.0001	loss 0.5380 (0.5413)	balanced accuracy 87.67%	mem 0MB

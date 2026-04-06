@@ -1,0 +1,1664 @@
+[2026-03-17 23:15:42 - logger] - (main.py - 330): INFO - aug:
+  cutmix: 0.0
+  cutmix_minmax: null
+  mixup: 0.0
+  mixup_mode: batch
+  mixup_prob: 0.0
+  mixup_switch_prob: 0.0
+connectome:
+  frequency_band:
+    beta:
+    - 12.0
+    - 30.0
+    delta:
+    - 2.0
+    - 4.0
+    gamma:
+    - 30.0
+    - 45.0
+    high_alpha:
+    - 10.0
+    - 12.0
+    high_beta:
+    - 21.0
+    - 30.0
+    low_alpha:
+    - 8.0
+    - 10.0
+    low_beta:
+    - 12.0
+    - 18.0
+    mid_beta:
+    - 18.0
+    - 21.0
+    theta:
+    - 4.0
+    - 8.0
+  methods:
+  - coh
+  - wpli
+  path:
+    data_dir: <preprocessed-path-to-preprocessed-data>
+    save_dir: <save-path-to-connectome>
+dataset: BEED
+model:
+  attn_drop: 0.0
+  dim_edge_feat: 128
+  dim_node_feat: 128
+  dropout: 0.0
+  droppath: 0.0
+  explainer_type: DeepLift
+  gnn_type: GINEConv
+  init_values: 0.001
+  mlp_ratio: 4.0
+  num_classes: 2
+  num_edge_feat: 1
+  num_gnn_layer: 4
+  num_head: 4
+  num_node_feat: 16
+  num_transformer_layer: 6
+model_name: XAIguiFormer
+num_workers: 2
+out_root: output
+preprocessing:
+  h_freq: 45
+  ica:
+    fit_params:
+      extended: true
+    ic_label_threshold: 0.0
+    method: infomax
+    n_components: 20
+  l_freq: 1
+  line_frequency: 60
+  n_jobs: null
+  n_workers: 4
+  path:
+    data_dir: <path-to-raw-dataset>
+    electrode_locations: <file-path-to-elec_loc.csv>
+    save_dir: <save-path-to-preprocesses-data>
+pretrain: false
+pretrained_model: ''
+print_freq: 5
+root: EEGBenchmarkDataset
+save_fname: XAIguiFormer_lr4e-05_weightdecay0.0001_20260317_231542
+seed: 42
+train:
+  batch_size: 128
+  criterion:
+    alpha: 0.7
+    smoothing: 0.1
+  epochs: 50
+  lr_scheduler:
+    lr_min: 1.0e-07
+    warmup_epochs: 3
+    warmup_lr: 1.0e-07
+  optimizer:
+    betas:
+    - 0.9
+    - 0.99
+    eps: 1.0e-08
+    lr: 4.0e-05
+    weight_decay: 0.0001
+
+[2026-03-17 23:15:42 - logger] - (main.py - 60): INFO - Creating model:
+
+[2026-03-17 23:15:42 - logger] - (main.py - 85): INFO - XAIguiFormer(
+  (ConnectomeEncoder): ConnectomeEncoder(
+    (node_embedding): Linear(in_features=16, out_features=128, bias=True)
+    (edge_embedding): Linear(in_features=1, out_features=128, bias=True)
+    (gnns): GNN(
+      (convs): ModuleList(
+        (0-3): 4 x GINEConv(
+          (MLP): MLP(
+            (fcs): ModuleList(
+              (0-1): 2 x Linear(in_features=128, out_features=128, bias=True)
+            )
+            (norms): ModuleList(
+              (0-1): 2 x Identity()
+            )
+            (act_funcs): ModuleList(
+              (0-1): 2 x GELU(approximate='none')
+            )
+            (dropouts): ModuleList(
+              (0-1): 2 x Dropout(p=0.0, inplace=False)
+            )
+          )
+          (layer): GINEConv(nn=MLP(
+            (fcs): ModuleList(
+              (0-1): 2 x Linear(in_features=128, out_features=128, bias=True)
+            )
+            (norms): ModuleList(
+              (0-1): 2 x Identity()
+            )
+            (act_funcs): ModuleList(
+              (0-1): 2 x GELU(approximate='none')
+            )
+            (dropouts): ModuleList(
+              (0-1): 2 x Dropout(p=0.0, inplace=False)
+            )
+          ))
+        )
+      )
+      (norms): ModuleList(
+        (0-3): 4 x RmsNorm()
+      )
+      (act_funcs): ModuleList(
+        (0-3): 4 x GeGLU()
+      )
+      (projs): ModuleList(
+        (0-3): 4 x Linear(in_features=128, out_features=256, bias=True)
+      )
+      (dropouts): ModuleList(
+        (0-3): 4 x Dropout(p=0.0, inplace=False)
+      )
+      (output_embedding): Linear(in_features=128, out_features=128, bias=True)
+    )
+    (dropout): Dropout(p=0.0, inplace=False)
+  )
+  (TransformerEncoder): XAIguiTransformerEncoder(
+    (TransformerEncoder): ModuleList(
+      (0-5): 6 x XAIguiTransformerEncoderLayer(
+        (norm1): RmsNorm()
+        (attn): XAIguiAttention(
+          (qkv): Linear(in_features=128, out_features=384, bias=True)
+          (attn_drop): Dropout(p=0.0, inplace=False)
+          (proj): Linear(in_features=128, out_features=128, bias=True)
+          (proj_drop): Dropout(p=0.0, inplace=False)
+          (rope2D): dRoFE()
+        )
+        (ls1): LayerScale()
+        (drop_path1): Identity()
+        (norm2): RmsNorm()
+        (mlp): MLP(
+          (fcs): ModuleList(
+            (0): Linear(in_features=128, out_features=1024, bias=True)
+            (1): Linear(in_features=512, out_features=128, bias=True)
+          )
+          (norms): ModuleList(
+            (0-1): 2 x Identity()
+          )
+          (act_funcs): ModuleList(
+            (0-1): 2 x GeGLU()
+          )
+          (dropouts): ModuleList(
+            (0-1): 2 x Dropout(p=0.0, inplace=False)
+          )
+        )
+        (ls2): LayerScale()
+        (drop_path2): Identity()
+      )
+    )
+    (avgpool): AvgPool()
+    (head): MLP(
+      (fcs): ModuleList(
+        (0): Linear(in_features=128, out_features=256, bias=True)
+        (1): Linear(in_features=128, out_features=2, bias=True)
+      )
+      (norms): ModuleList(
+        (0-1): 2 x Identity()
+      )
+      (act_funcs): ModuleList(
+        (0-1): 2 x GeGLU()
+      )
+      (dropouts): ModuleList(
+        (0-1): 2 x Dropout(p=0.0, inplace=False)
+      )
+    )
+  )
+  (explainer): Explainer(
+    (explainer): DeepLift()
+  )
+)
+[2026-03-17 23:15:42 - logger] - (main.py - 107): INFO - ----------------------------------- Start training -----------------------------------
+[2026-03-17 23:15:46 - logger] - (main.py - 199): INFO - Train: [1/50][1/42]	lr 0.000000	 wd 0.0001	loss 0.6761 (0.6761)	balanced accuracy 69.65%	mem 0MB
+[2026-03-17 23:15:47 - logger] - (main.py - 199): INFO - Train: [1/50][6/42]	lr 0.000001	 wd 0.0001	loss 0.6747 (0.6716)	balanced accuracy 71.88%	mem 0MB
+[2026-03-17 23:15:49 - logger] - (main.py - 199): INFO - Train: [1/50][11/42]	lr 0.000003	 wd 0.0001	loss 0.6659 (0.6689)	balanced accuracy 74.62%	mem 0MB
+[2026-03-17 23:15:51 - logger] - (main.py - 199): INFO - Train: [1/50][16/42]	lr 0.000005	 wd 0.0001	loss 0.6519 (0.6672)	balanced accuracy 77.44%	mem 0MB
+[2026-03-17 23:15:52 - logger] - (main.py - 199): INFO - Train: [1/50][21/42]	lr 0.000006	 wd 0.0001	loss 0.6472 (0.6643)	balanced accuracy 75.00%	mem 0MB
+[2026-03-17 23:15:54 - logger] - (main.py - 199): INFO - Train: [1/50][26/42]	lr 0.000008	 wd 0.0001	loss 0.6318 (0.6591)	balanced accuracy 82.43%	mem 0MB
+[2026-03-17 23:15:56 - logger] - (main.py - 199): INFO - Train: [1/50][31/42]	lr 0.000009	 wd 0.0001	loss 0.6265 (0.6524)	balanced accuracy 79.07%	mem 0MB
+[2026-03-17 23:15:58 - logger] - (main.py - 199): INFO - Train: [1/50][36/42]	lr 0.000011	 wd 0.0001	loss 0.5663 (0.6439)	balanced accuracy 91.94%	mem 0MB
+[2026-03-17 23:16:00 - logger] - (main.py - 199): INFO - Train: [1/50][41/42]	lr 0.000012	 wd 0.0001	loss 0.5506 (0.6350)	balanced accuracy 89.82%	mem 0MB
+[2026-03-17 23:16:01 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:16:01 - logger] - (main.py - 214): INFO - EPOCH 1: train balanced accuracy 77.52% train takes 0:00:18
+[2026-03-17 23:16:01 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:16:13 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:16:13 - logger] - (main.py - 269): INFO - Test: 
+time 12.149	loss 0.5551	balanced accuracy 87.56%	mem 0MB
+[2026-03-17 23:16:13 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0098
+[2026-03-17 23:16:13 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:16:13 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:16:13 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:16:13 - logger] - (main.py - 127): INFO - Epoch: 001
+train balanced accuracy: 77.52%, sensitivity: 77.52%, aucpr: 0.7900, auroc: 0.8449, loss: 0.6332
+val balanced accuracy: 87.56%, sensitivity: 87.56%, aucpr: 0.9293, auroc: 0.9580, loss: 0.5551
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:16:13 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:16:16 - logger] - (main.py - 199): INFO - Train: [2/50][1/42]	lr 0.000013	 wd 0.0001	loss 0.5620 (0.5620)	balanced accuracy 82.79%	mem 0MB
+[2026-03-17 23:16:18 - logger] - (main.py - 199): INFO - Train: [2/50][6/42]	lr 0.000015	 wd 0.0001	loss 0.5380 (0.5413)	balanced accuracy 87.67%	mem 0MB
+[2026-03-17 23:16:20 - logger] - (main.py - 199): INFO - Train: [2/50][11/42]	lr 0.000016	 wd 0.0001	loss 0.5045 (0.5305)	balanced accuracy 86.80%	mem 0MB
+[2026-03-17 23:16:22 - logger] - (main.py - 199): INFO - Train: [2/50][16/42]	lr 0.000018	 wd 0.0001	loss 0.4705 (0.5176)	balanced accuracy 92.96%	mem 0MB
+[2026-03-17 23:16:24 - logger] - (main.py - 199): INFO - Train: [2/50][21/42]	lr 0.000019	 wd 0.0001	loss 0.4777 (0.5077)	balanced accuracy 87.60%	mem 0MB
+[2026-03-17 23:16:26 - logger] - (main.py - 199): INFO - Train: [2/50][26/42]	lr 0.000021	 wd 0.0001	loss 0.4603 (0.4967)	balanced accuracy 90.22%	mem 0MB
+[2026-03-17 23:16:29 - logger] - (main.py - 199): INFO - Train: [2/50][31/42]	lr 0.000023	 wd 0.0001	loss 0.4073 (0.4831)	balanced accuracy 89.66%	mem 0MB
+[2026-03-17 23:16:31 - logger] - (main.py - 199): INFO - Train: [2/50][36/42]	lr 0.000024	 wd 0.0001	loss 0.3743 (0.4700)	balanced accuracy 91.67%	mem 0MB
+[2026-03-17 23:16:33 - logger] - (main.py - 199): INFO - Train: [2/50][41/42]	lr 0.000026	 wd 0.0001	loss 0.3892 (0.4599)	balanced accuracy 85.48%	mem 0MB
+[2026-03-17 23:16:34 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:16:34 - logger] - (main.py - 214): INFO - EPOCH 2: train balanced accuracy 88.72% train takes 0:00:20
+[2026-03-17 23:16:34 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:16:45 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:16:45 - logger] - (main.py - 269): INFO - Test: 
+time 11.131	loss 0.3725	balanced accuracy 88.64%	mem 0MB
+[2026-03-17 23:16:45 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0109
+[2026-03-17 23:16:45 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:16:45 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:16:45 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:16:45 - logger] - (main.py - 127): INFO - Epoch: 002
+train balanced accuracy: 88.72%, sensitivity: 88.72%, aucpr: 0.9756, auroc: 0.9849, loss: 0.4586
+val balanced accuracy: 88.64%, sensitivity: 88.64%, aucpr: 0.9921, auroc: 0.9947, loss: 0.3725
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:16:45 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:16:48 - logger] - (main.py - 199): INFO - Train: [3/50][1/42]	lr 0.000026	 wd 0.0001	loss 0.3332 (0.3332)	balanced accuracy 91.30%	mem 0MB
+[2026-03-17 23:16:49 - logger] - (main.py - 199): INFO - Train: [3/50][6/42]	lr 0.000028	 wd 0.0001	loss 0.3399 (0.3608)	balanced accuracy 90.00%	mem 0MB
+[2026-03-17 23:16:51 - logger] - (main.py - 199): INFO - Train: [3/50][11/42]	lr 0.000030	 wd 0.0001	loss 0.3111 (0.3557)	balanced accuracy 92.00%	mem 0MB
+[2026-03-17 23:16:53 - logger] - (main.py - 199): INFO - Train: [3/50][16/42]	lr 0.000031	 wd 0.0001	loss 0.3365 (0.3526)	balanced accuracy 93.94%	mem 0MB
+[2026-03-17 23:16:55 - logger] - (main.py - 199): INFO - Train: [3/50][21/42]	lr 0.000033	 wd 0.0001	loss 0.3301 (0.3486)	balanced accuracy 94.83%	mem 0MB
+[2026-03-17 23:16:57 - logger] - (main.py - 199): INFO - Train: [3/50][26/42]	lr 0.000034	 wd 0.0001	loss 0.3252 (0.3429)	balanced accuracy 93.24%	mem 0MB
+[2026-03-17 23:16:58 - logger] - (main.py - 199): INFO - Train: [3/50][31/42]	lr 0.000036	 wd 0.0001	loss 0.3346 (0.3405)	balanced accuracy 92.31%	mem 0MB
+[2026-03-17 23:17:00 - logger] - (main.py - 199): INFO - Train: [3/50][36/42]	lr 0.000037	 wd 0.0001	loss 0.3122 (0.3351)	balanced accuracy 95.71%	mem 0MB
+[2026-03-17 23:17:02 - logger] - (main.py - 199): INFO - Train: [3/50][41/42]	lr 0.000039	 wd 0.0001	loss 0.3205 (0.3307)	balanced accuracy 93.24%	mem 0MB
+[2026-03-17 23:17:03 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:17:03 - logger] - (main.py - 214): INFO - EPOCH 3: train balanced accuracy 91.72% train takes 0:00:17
+[2026-03-17 23:17:03 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:17:15 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:17:15 - logger] - (main.py - 269): INFO - Test: 
+time 12.517	loss 0.2948	balanced accuracy 95.30%	mem 0MB
+[2026-03-17 23:17:15 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0123
+[2026-03-17 23:17:15 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:17:15 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:17:15 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:17:15 - logger] - (main.py - 127): INFO - Epoch: 003
+train balanced accuracy: 91.72%, sensitivity: 91.72%, aucpr: 0.9960, auroc: 0.9971, loss: 0.3304
+val balanced accuracy: 95.30%, sensitivity: 95.30%, aucpr: 0.9976, auroc: 0.9984, loss: 0.2948
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:17:15 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:17:19 - logger] - (main.py - 199): INFO - Train: [4/50][1/42]	lr 0.000040	 wd 0.0001	loss 0.2899 (0.2899)	balanced accuracy 98.48%	mem 0MB
+[2026-03-17 23:17:21 - logger] - (main.py - 199): INFO - Train: [4/50][6/42]	lr 0.000040	 wd 0.0001	loss 0.2941 (0.2953)	balanced accuracy 97.62%	mem 0MB
+[2026-03-17 23:17:23 - logger] - (main.py - 199): INFO - Train: [4/50][11/42]	lr 0.000040	 wd 0.0001	loss 0.2768 (0.2898)	balanced accuracy 98.44%	mem 0MB
+[2026-03-17 23:17:25 - logger] - (main.py - 199): INFO - Train: [4/50][16/42]	lr 0.000040	 wd 0.0001	loss 0.2766 (0.2870)	balanced accuracy 95.31%	mem 0MB
+[2026-03-17 23:17:27 - logger] - (main.py - 199): INFO - Train: [4/50][21/42]	lr 0.000040	 wd 0.0001	loss 0.2536 (0.2829)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:17:29 - logger] - (main.py - 199): INFO - Train: [4/50][26/42]	lr 0.000039	 wd 0.0001	loss 0.2596 (0.2815)	balanced accuracy 96.00%	mem 0MB
+[2026-03-17 23:17:31 - logger] - (main.py - 199): INFO - Train: [4/50][31/42]	lr 0.000039	 wd 0.0001	loss 0.2559 (0.2795)	balanced accuracy 98.44%	mem 0MB
+[2026-03-17 23:17:32 - logger] - (main.py - 199): INFO - Train: [4/50][36/42]	lr 0.000039	 wd 0.0001	loss 0.2422 (0.2764)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:17:34 - logger] - (main.py - 199): INFO - Train: [4/50][41/42]	lr 0.000039	 wd 0.0001	loss 0.2355 (0.2729)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:17:35 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:17:35 - logger] - (main.py - 214): INFO - EPOCH 4: train balanced accuracy 97.36% train takes 0:00:20
+[2026-03-17 23:17:35 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:17:46 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:17:46 - logger] - (main.py - 269): INFO - Test: 
+time 10.753	loss 0.2531	balanced accuracy 97.78%	mem 0MB
+[2026-03-17 23:17:46 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0132
+[2026-03-17 23:17:46 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:17:46 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:17:46 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:17:46 - logger] - (main.py - 127): INFO - Epoch: 004
+train balanced accuracy: 97.36%, sensitivity: 97.36%, aucpr: 0.9986, auroc: 0.9990, loss: 0.2725
+val balanced accuracy: 97.78%, sensitivity: 97.78%, aucpr: 0.9990, auroc: 0.9993, loss: 0.2531
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:17:46 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:17:50 - logger] - (main.py - 199): INFO - Train: [5/50][1/42]	lr 0.000039	 wd 0.0001	loss 0.2755 (0.2755)	balanced accuracy 97.30%	mem 0MB
+[2026-03-17 23:17:51 - logger] - (main.py - 199): INFO - Train: [5/50][6/42]	lr 0.000039	 wd 0.0001	loss 0.2568 (0.2555)	balanced accuracy 95.45%	mem 0MB
+[2026-03-17 23:17:53 - logger] - (main.py - 199): INFO - Train: [5/50][11/42]	lr 0.000039	 wd 0.0001	loss 0.2520 (0.2509)	balanced accuracy 97.44%	mem 0MB
+[2026-03-17 23:17:55 - logger] - (main.py - 199): INFO - Train: [5/50][16/42]	lr 0.000039	 wd 0.0001	loss 0.2464 (0.2484)	balanced accuracy 98.57%	mem 0MB
+[2026-03-17 23:17:57 - logger] - (main.py - 199): INFO - Train: [5/50][21/42]	lr 0.000039	 wd 0.0001	loss 0.2366 (0.2460)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:17:59 - logger] - (main.py - 199): INFO - Train: [5/50][26/42]	lr 0.000039	 wd 0.0001	loss 0.2399 (0.2439)	balanced accuracy 98.48%	mem 0MB
+[2026-03-17 23:18:00 - logger] - (main.py - 199): INFO - Train: [5/50][31/42]	lr 0.000039	 wd 0.0001	loss 0.2494 (0.2427)	balanced accuracy 98.86%	mem 0MB
+[2026-03-17 23:18:02 - logger] - (main.py - 199): INFO - Train: [5/50][36/42]	lr 0.000039	 wd 0.0001	loss 0.2279 (0.2412)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:18:04 - logger] - (main.py - 199): INFO - Train: [5/50][41/42]	lr 0.000039	 wd 0.0001	loss 0.2486 (0.2404)	balanced accuracy 94.19%	mem 0MB
+[2026-03-17 23:18:05 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:18:05 - logger] - (main.py - 214): INFO - EPOCH 5: train balanced accuracy 98.54% train takes 0:00:18
+[2026-03-17 23:18:05 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:18:16 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:18:16 - logger] - (main.py - 269): INFO - Test: 
+time 11.447	loss 0.2304	balanced accuracy 98.73%	mem 0MB
+[2026-03-17 23:18:16 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0139
+[2026-03-17 23:18:16 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:18:16 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:18:16 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:18:16 - logger] - (main.py - 127): INFO - Epoch: 005
+train balanced accuracy: 98.54%, sensitivity: 98.54%, aucpr: 0.9995, auroc: 0.9996, loss: 0.2402
+val balanced accuracy: 98.73%, sensitivity: 98.73%, aucpr: 0.9995, auroc: 0.9997, loss: 0.2304
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:18:16 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:18:20 - logger] - (main.py - 199): INFO - Train: [6/50][1/42]	lr 0.000039	 wd 0.0001	loss 0.2199 (0.2199)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:18:21 - logger] - (main.py - 199): INFO - Train: [6/50][6/42]	lr 0.000039	 wd 0.0001	loss 0.2283 (0.2297)	balanced accuracy 98.08%	mem 0MB
+[2026-03-17 23:18:23 - logger] - (main.py - 199): INFO - Train: [6/50][11/42]	lr 0.000039	 wd 0.0001	loss 0.2274 (0.2254)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:18:25 - logger] - (main.py - 199): INFO - Train: [6/50][16/42]	lr 0.000039	 wd 0.0001	loss 0.2173 (0.2258)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:18:27 - logger] - (main.py - 199): INFO - Train: [6/50][21/42]	lr 0.000039	 wd 0.0001	loss 0.2124 (0.2247)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:18:28 - logger] - (main.py - 199): INFO - Train: [6/50][26/42]	lr 0.000039	 wd 0.0001	loss 0.2318 (0.2241)	balanced accuracy 98.39%	mem 0MB
+[2026-03-17 23:18:30 - logger] - (main.py - 199): INFO - Train: [6/50][31/42]	lr 0.000039	 wd 0.0001	loss 0.2197 (0.2237)	balanced accuracy 98.65%	mem 0MB
+[2026-03-17 23:18:32 - logger] - (main.py - 199): INFO - Train: [6/50][36/42]	lr 0.000039	 wd 0.0001	loss 0.2166 (0.2229)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:18:34 - logger] - (main.py - 199): INFO - Train: [6/50][41/42]	lr 0.000039	 wd 0.0001	loss 0.2188 (0.2223)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:18:35 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:18:35 - logger] - (main.py - 214): INFO - EPOCH 6: train balanced accuracy 99.12% train takes 0:00:18
+[2026-03-17 23:18:35 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:18:46 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:18:46 - logger] - (main.py - 269): INFO - Test: 
+time 11.073	loss 0.2178	balanced accuracy 99.21%	mem 0MB
+[2026-03-17 23:18:46 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0148
+[2026-03-17 23:18:46 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:18:46 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:18:46 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:18:46 - logger] - (main.py - 127): INFO - Epoch: 006
+train balanced accuracy: 99.12%, sensitivity: 99.12%, aucpr: 0.9997, auroc: 0.9998, loss: 0.2223
+val balanced accuracy: 99.21%, sensitivity: 99.21%, aucpr: 0.9998, auroc: 0.9999, loss: 0.2178
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:18:46 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:18:49 - logger] - (main.py - 199): INFO - Train: [7/50][1/42]	lr 0.000039	 wd 0.0001	loss 0.2150 (0.2150)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:18:51 - logger] - (main.py - 199): INFO - Train: [7/50][6/42]	lr 0.000039	 wd 0.0001	loss 0.2105 (0.2129)	balanced accuracy 98.08%	mem 0MB
+[2026-03-17 23:18:53 - logger] - (main.py - 199): INFO - Train: [7/50][11/42]	lr 0.000038	 wd 0.0001	loss 0.2082 (0.2124)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:18:54 - logger] - (main.py - 199): INFO - Train: [7/50][16/42]	lr 0.000038	 wd 0.0001	loss 0.2213 (0.2129)	balanced accuracy 99.48%	mem 0MB
+[2026-03-17 23:18:56 - logger] - (main.py - 199): INFO - Train: [7/50][21/42]	lr 0.000038	 wd 0.0001	loss 0.2121 (0.2128)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:18:58 - logger] - (main.py - 199): INFO - Train: [7/50][26/42]	lr 0.000038	 wd 0.0001	loss 0.2093 (0.2119)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:18:59 - logger] - (main.py - 199): INFO - Train: [7/50][31/42]	lr 0.000038	 wd 0.0001	loss 0.2105 (0.2119)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:19:01 - logger] - (main.py - 199): INFO - Train: [7/50][36/42]	lr 0.000038	 wd 0.0001	loss 0.2119 (0.2119)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:19:03 - logger] - (main.py - 199): INFO - Train: [7/50][41/42]	lr 0.000038	 wd 0.0001	loss 0.2225 (0.2124)	balanced accuracy 98.86%	mem 0MB
+[2026-03-17 23:19:04 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:19:04 - logger] - (main.py - 214): INFO - EPOCH 7: train balanced accuracy 99.38% train takes 0:00:18
+[2026-03-17 23:19:04 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:19:14 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:19:14 - logger] - (main.py - 269): INFO - Test: 
+time 10.547	loss 0.2114	balanced accuracy 99.47%	mem 0MB
+[2026-03-17 23:19:14 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0155
+[2026-03-17 23:19:14 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:19:14 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:19:14 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:19:14 - logger] - (main.py - 127): INFO - Epoch: 007
+train balanced accuracy: 99.38%, sensitivity: 99.38%, aucpr: 0.9999, auroc: 0.9999, loss: 0.2128
+val balanced accuracy: 99.47%, sensitivity: 99.47%, aucpr: 0.9999, auroc: 0.9999, loss: 0.2114
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:19:14 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:19:18 - logger] - (main.py - 199): INFO - Train: [8/50][1/42]	lr 0.000038	 wd 0.0001	loss 0.2083 (0.2083)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:19:19 - logger] - (main.py - 199): INFO - Train: [8/50][6/42]	lr 0.000038	 wd 0.0001	loss 0.2079 (0.2092)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:19:21 - logger] - (main.py - 199): INFO - Train: [8/50][11/42]	lr 0.000038	 wd 0.0001	loss 0.2092 (0.2089)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:19:22 - logger] - (main.py - 199): INFO - Train: [8/50][16/42]	lr 0.000038	 wd 0.0001	loss 0.2093 (0.2091)	balanced accuracy 98.39%	mem 0MB
+[2026-03-17 23:19:24 - logger] - (main.py - 199): INFO - Train: [8/50][21/42]	lr 0.000038	 wd 0.0001	loss 0.2130 (0.2087)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:19:26 - logger] - (main.py - 199): INFO - Train: [8/50][26/42]	lr 0.000038	 wd 0.0001	loss 0.2081 (0.2083)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:19:28 - logger] - (main.py - 199): INFO - Train: [8/50][31/42]	lr 0.000038	 wd 0.0001	loss 0.2022 (0.2082)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:19:29 - logger] - (main.py - 199): INFO - Train: [8/50][36/42]	lr 0.000038	 wd 0.0001	loss 0.2034 (0.2088)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:19:31 - logger] - (main.py - 199): INFO - Train: [8/50][41/42]	lr 0.000038	 wd 0.0001	loss 0.2032 (0.2083)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:19:32 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:19:32 - logger] - (main.py - 214): INFO - EPOCH 8: train balanced accuracy 99.60% train takes 0:00:17
+[2026-03-17 23:19:32 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:19:43 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:19:43 - logger] - (main.py - 269): INFO - Test: 
+time 10.655	loss 0.2079	balanced accuracy 99.31%	mem 0MB
+[2026-03-17 23:19:43 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0158
+[2026-03-17 23:19:43 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:19:43 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:19:43 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:19:43 - logger] - (main.py - 127): INFO - Epoch: 008
+train balanced accuracy: 99.60%, sensitivity: 99.60%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2082
+val balanced accuracy: 99.31%, sensitivity: 99.31%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2079
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:19:43 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:19:46 - logger] - (main.py - 199): INFO - Train: [9/50][1/42]	lr 0.000038	 wd 0.0001	loss 0.2101 (0.2101)	balanced accuracy 98.68%	mem 0MB
+[2026-03-17 23:19:47 - logger] - (main.py - 199): INFO - Train: [9/50][6/42]	lr 0.000037	 wd 0.0001	loss 0.2045 (0.2080)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:19:49 - logger] - (main.py - 199): INFO - Train: [9/50][11/42]	lr 0.000037	 wd 0.0001	loss 0.2088 (0.2069)	balanced accuracy 98.33%	mem 0MB
+[2026-03-17 23:19:51 - logger] - (main.py - 199): INFO - Train: [9/50][16/42]	lr 0.000037	 wd 0.0001	loss 0.2170 (0.2068)	balanced accuracy 97.56%	mem 0MB
+[2026-03-17 23:19:52 - logger] - (main.py - 199): INFO - Train: [9/50][21/42]	lr 0.000037	 wd 0.0001	loss 0.2085 (0.2060)	balanced accuracy 97.37%	mem 0MB
+[2026-03-17 23:19:54 - logger] - (main.py - 199): INFO - Train: [9/50][26/42]	lr 0.000037	 wd 0.0001	loss 0.2024 (0.2057)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:19:56 - logger] - (main.py - 199): INFO - Train: [9/50][31/42]	lr 0.000037	 wd 0.0001	loss 0.2140 (0.2058)	balanced accuracy 98.08%	mem 0MB
+[2026-03-17 23:19:58 - logger] - (main.py - 199): INFO - Train: [9/50][36/42]	lr 0.000037	 wd 0.0001	loss 0.2034 (0.2058)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:19:59 - logger] - (main.py - 199): INFO - Train: [9/50][41/42]	lr 0.000037	 wd 0.0001	loss 0.2041 (0.2056)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:20:00 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:20:00 - logger] - (main.py - 214): INFO - EPOCH 9: train balanced accuracy 99.61% train takes 0:00:17
+[2026-03-17 23:20:00 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:20:12 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:20:12 - logger] - (main.py - 269): INFO - Test: 
+time 11.180	loss 0.2058	balanced accuracy 99.58%	mem 0MB
+[2026-03-17 23:20:12 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0163
+[2026-03-17 23:20:12 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:20:12 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:20:12 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:20:12 - logger] - (main.py - 127): INFO - Epoch: 009
+train balanced accuracy: 99.61%, sensitivity: 99.61%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2056
+val balanced accuracy: 99.58%, sensitivity: 99.58%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2058
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:20:12 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:20:15 - logger] - (main.py - 199): INFO - Train: [10/50][1/42]	lr 0.000037	 wd 0.0001	loss 0.2105 (0.2105)	balanced accuracy 98.48%	mem 0MB
+[2026-03-17 23:20:16 - logger] - (main.py - 199): INFO - Train: [10/50][6/42]	lr 0.000037	 wd 0.0001	loss 0.2036 (0.2064)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:20:18 - logger] - (main.py - 199): INFO - Train: [10/50][11/42]	lr 0.000037	 wd 0.0001	loss 0.2096 (0.2062)	balanced accuracy 98.21%	mem 0MB
+[2026-03-17 23:20:19 - logger] - (main.py - 199): INFO - Train: [10/50][16/42]	lr 0.000037	 wd 0.0001	loss 0.2011 (0.2055)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:20:21 - logger] - (main.py - 199): INFO - Train: [10/50][21/42]	lr 0.000037	 wd 0.0001	loss 0.2144 (0.2053)	balanced accuracy 98.28%	mem 0MB
+[2026-03-17 23:20:23 - logger] - (main.py - 199): INFO - Train: [10/50][26/42]	lr 0.000036	 wd 0.0001	loss 0.2053 (0.2049)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:20:24 - logger] - (main.py - 199): INFO - Train: [10/50][31/42]	lr 0.000036	 wd 0.0001	loss 0.2038 (0.2046)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:20:26 - logger] - (main.py - 199): INFO - Train: [10/50][36/42]	lr 0.000036	 wd 0.0001	loss 0.2043 (0.2043)	balanced accuracy 98.33%	mem 0MB
+[2026-03-17 23:20:28 - logger] - (main.py - 199): INFO - Train: [10/50][41/42]	lr 0.000036	 wd 0.0001	loss 0.2025 (0.2041)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:20:29 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:20:29 - logger] - (main.py - 214): INFO - EPOCH 10: train balanced accuracy 99.67% train takes 0:00:17
+[2026-03-17 23:20:29 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:20:40 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:20:40 - logger] - (main.py - 269): INFO - Test: 
+time 11.154	loss 0.2044	balanced accuracy 99.52%	mem 0MB
+[2026-03-17 23:20:40 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0165
+[2026-03-17 23:20:40 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:20:40 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:20:40 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:20:40 - logger] - (main.py - 127): INFO - Epoch: 010
+train balanced accuracy: 99.67%, sensitivity: 99.67%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2040
+val balanced accuracy: 99.52%, sensitivity: 99.52%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2044
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:20:40 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:20:43 - logger] - (main.py - 199): INFO - Train: [11/50][1/42]	lr 0.000036	 wd 0.0001	loss 0.2046 (0.2046)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:20:44 - logger] - (main.py - 199): INFO - Train: [11/50][6/42]	lr 0.000036	 wd 0.0001	loss 0.1996 (0.2018)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:20:46 - logger] - (main.py - 199): INFO - Train: [11/50][11/42]	lr 0.000036	 wd 0.0001	loss 0.2018 (0.2022)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:20:48 - logger] - (main.py - 199): INFO - Train: [11/50][16/42]	lr 0.000036	 wd 0.0001	loss 0.2043 (0.2026)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:20:50 - logger] - (main.py - 199): INFO - Train: [11/50][21/42]	lr 0.000036	 wd 0.0001	loss 0.2001 (0.2024)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:20:52 - logger] - (main.py - 199): INFO - Train: [11/50][26/42]	lr 0.000036	 wd 0.0001	loss 0.2018 (0.2024)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:20:53 - logger] - (main.py - 199): INFO - Train: [11/50][31/42]	lr 0.000036	 wd 0.0001	loss 0.2022 (0.2023)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:20:55 - logger] - (main.py - 199): INFO - Train: [11/50][36/42]	lr 0.000036	 wd 0.0001	loss 0.2017 (0.2025)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:20:57 - logger] - (main.py - 199): INFO - Train: [11/50][41/42]	lr 0.000035	 wd 0.0001	loss 0.2027 (0.2028)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:20:58 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:20:58 - logger] - (main.py - 214): INFO - EPOCH 11: train balanced accuracy 99.75% train takes 0:00:18
+[2026-03-17 23:20:58 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:21:09 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:21:09 - logger] - (main.py - 269): INFO - Test: 
+time 11.233	loss 0.2034	balanced accuracy 99.74%	mem 0MB
+[2026-03-17 23:21:09 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0167
+[2026-03-17 23:21:09 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:21:09 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:21:09 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:21:09 - logger] - (main.py - 127): INFO - Epoch: 011
+train balanced accuracy: 99.75%, sensitivity: 99.75%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2028
+val balanced accuracy: 99.74%, sensitivity: 99.74%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2034
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:21:09 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:21:12 - logger] - (main.py - 199): INFO - Train: [12/50][1/42]	lr 0.000035	 wd 0.0001	loss 0.2008 (0.2008)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:21:14 - logger] - (main.py - 199): INFO - Train: [12/50][6/42]	lr 0.000035	 wd 0.0001	loss 0.2089 (0.2027)	balanced accuracy 98.21%	mem 0MB
+[2026-03-17 23:21:15 - logger] - (main.py - 199): INFO - Train: [12/50][11/42]	lr 0.000035	 wd 0.0001	loss 0.2040 (0.2027)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:21:17 - logger] - (main.py - 199): INFO - Train: [12/50][16/42]	lr 0.000035	 wd 0.0001	loss 0.2115 (0.2032)	balanced accuracy 98.39%	mem 0MB
+[2026-03-17 23:21:19 - logger] - (main.py - 199): INFO - Train: [12/50][21/42]	lr 0.000035	 wd 0.0001	loss 0.2003 (0.2026)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:21:20 - logger] - (main.py - 199): INFO - Train: [12/50][26/42]	lr 0.000035	 wd 0.0001	loss 0.2005 (0.2023)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:21:22 - logger] - (main.py - 199): INFO - Train: [12/50][31/42]	lr 0.000035	 wd 0.0001	loss 0.2046 (0.2021)	balanced accuracy 98.65%	mem 0MB
+[2026-03-17 23:21:24 - logger] - (main.py - 199): INFO - Train: [12/50][36/42]	lr 0.000035	 wd 0.0001	loss 0.2009 (0.2020)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:21:26 - logger] - (main.py - 199): INFO - Train: [12/50][41/42]	lr 0.000035	 wd 0.0001	loss 0.2001 (0.2020)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:21:27 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:21:27 - logger] - (main.py - 214): INFO - EPOCH 12: train balanced accuracy 99.81% train takes 0:00:17
+[2026-03-17 23:21:27 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:21:38 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:21:38 - logger] - (main.py - 269): INFO - Test: 
+time 10.886	loss 0.2023	balanced accuracy 99.74%	mem 0MB
+[2026-03-17 23:21:38 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0167
+[2026-03-17 23:21:38 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:21:38 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:21:38 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:21:38 - logger] - (main.py - 127): INFO - Epoch: 012
+train balanced accuracy: 99.81%, sensitivity: 99.81%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2019
+val balanced accuracy: 99.74%, sensitivity: 99.74%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2023
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:21:38 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:21:41 - logger] - (main.py - 199): INFO - Train: [13/50][1/42]	lr 0.000035	 wd 0.0001	loss 0.2013 (0.2013)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:21:42 - logger] - (main.py - 199): INFO - Train: [13/50][6/42]	lr 0.000035	 wd 0.0001	loss 0.2108 (0.2025)	balanced accuracy 98.21%	mem 0MB
+[2026-03-17 23:21:44 - logger] - (main.py - 199): INFO - Train: [13/50][11/42]	lr 0.000034	 wd 0.0001	loss 0.2007 (0.2019)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:21:45 - logger] - (main.py - 199): INFO - Train: [13/50][16/42]	lr 0.000034	 wd 0.0001	loss 0.2001 (0.2016)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:21:47 - logger] - (main.py - 199): INFO - Train: [13/50][21/42]	lr 0.000034	 wd 0.0001	loss 0.2019 (0.2020)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:21:49 - logger] - (main.py - 199): INFO - Train: [13/50][26/42]	lr 0.000034	 wd 0.0001	loss 0.1999 (0.2016)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:21:51 - logger] - (main.py - 199): INFO - Train: [13/50][31/42]	lr 0.000034	 wd 0.0001	loss 0.2034 (0.2015)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:21:52 - logger] - (main.py - 199): INFO - Train: [13/50][36/42]	lr 0.000034	 wd 0.0001	loss 0.2010 (0.2014)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:21:54 - logger] - (main.py - 199): INFO - Train: [13/50][41/42]	lr 0.000034	 wd 0.0001	loss 0.2023 (0.2013)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:21:55 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:21:55 - logger] - (main.py - 214): INFO - EPOCH 13: train balanced accuracy 99.88% train takes 0:00:17
+[2026-03-17 23:21:55 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:22:07 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:22:07 - logger] - (main.py - 269): INFO - Test: 
+time 11.980	loss 0.2017	balanced accuracy 99.79%	mem 0MB
+[2026-03-17 23:22:07 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0167
+[2026-03-17 23:22:07 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:22:07 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:22:07 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:22:07 - logger] - (main.py - 127): INFO - Epoch: 013
+train balanced accuracy: 99.88%, sensitivity: 99.88%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2013
+val balanced accuracy: 99.79%, sensitivity: 99.79%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2017
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:22:07 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:22:11 - logger] - (main.py - 199): INFO - Train: [14/50][1/42]	lr 0.000034	 wd 0.0001	loss 0.2016 (0.2016)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:12 - logger] - (main.py - 199): INFO - Train: [14/50][6/42]	lr 0.000034	 wd 0.0001	loss 0.2002 (0.2007)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:14 - logger] - (main.py - 199): INFO - Train: [14/50][11/42]	lr 0.000034	 wd 0.0001	loss 0.1997 (0.2005)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:15 - logger] - (main.py - 199): INFO - Train: [14/50][16/42]	lr 0.000033	 wd 0.0001	loss 0.2008 (0.2013)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:17 - logger] - (main.py - 199): INFO - Train: [14/50][21/42]	lr 0.000033	 wd 0.0001	loss 0.2010 (0.2012)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:19 - logger] - (main.py - 199): INFO - Train: [14/50][26/42]	lr 0.000033	 wd 0.0001	loss 0.2033 (0.2013)	balanced accuracy 98.33%	mem 0MB
+[2026-03-17 23:22:21 - logger] - (main.py - 199): INFO - Train: [14/50][31/42]	lr 0.000033	 wd 0.0001	loss 0.1996 (0.2011)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:22 - logger] - (main.py - 199): INFO - Train: [14/50][36/42]	lr 0.000033	 wd 0.0001	loss 0.2000 (0.2010)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:24 - logger] - (main.py - 199): INFO - Train: [14/50][41/42]	lr 0.000033	 wd 0.0001	loss 0.1999 (0.2009)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:26 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:22:26 - logger] - (main.py - 214): INFO - EPOCH 14: train balanced accuracy 99.89% train takes 0:00:18
+[2026-03-17 23:22:26 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:22:36 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:22:36 - logger] - (main.py - 269): INFO - Test: 
+time 10.588	loss 0.2011	balanced accuracy 99.84%	mem 0MB
+[2026-03-17 23:22:36 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0168
+[2026-03-17 23:22:36 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:22:36 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:22:36 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:22:36 - logger] - (main.py - 127): INFO - Epoch: 014
+train balanced accuracy: 99.89%, sensitivity: 99.89%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2009
+val balanced accuracy: 99.84%, sensitivity: 99.84%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2011
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:22:36 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:22:39 - logger] - (main.py - 199): INFO - Train: [15/50][1/42]	lr 0.000033	 wd 0.0001	loss 0.2009 (0.2009)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:41 - logger] - (main.py - 199): INFO - Train: [15/50][6/42]	lr 0.000033	 wd 0.0001	loss 0.1997 (0.2015)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:42 - logger] - (main.py - 199): INFO - Train: [15/50][11/42]	lr 0.000033	 wd 0.0001	loss 0.2009 (0.2011)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:44 - logger] - (main.py - 199): INFO - Train: [15/50][16/42]	lr 0.000032	 wd 0.0001	loss 0.2020 (0.2012)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:46 - logger] - (main.py - 199): INFO - Train: [15/50][21/42]	lr 0.000032	 wd 0.0001	loss 0.1992 (0.2009)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:48 - logger] - (main.py - 199): INFO - Train: [15/50][26/42]	lr 0.000032	 wd 0.0001	loss 0.1997 (0.2007)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:50 - logger] - (main.py - 199): INFO - Train: [15/50][31/42]	lr 0.000032	 wd 0.0001	loss 0.1993 (0.2005)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:51 - logger] - (main.py - 199): INFO - Train: [15/50][36/42]	lr 0.000032	 wd 0.0001	loss 0.2002 (0.2005)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:53 - logger] - (main.py - 199): INFO - Train: [15/50][41/42]	lr 0.000032	 wd 0.0001	loss 0.1999 (0.2004)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:22:54 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:22:54 - logger] - (main.py - 214): INFO - EPOCH 15: train balanced accuracy 99.92% train takes 0:00:18
+[2026-03-17 23:22:54 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:23:06 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:23:06 - logger] - (main.py - 269): INFO - Test: 
+time 11.649	loss 0.2008	balanced accuracy 99.89%	mem 0MB
+[2026-03-17 23:23:06 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0168
+[2026-03-17 23:23:06 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:23:06 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:23:06 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:23:06 - logger] - (main.py - 127): INFO - Epoch: 015
+train balanced accuracy: 99.92%, sensitivity: 99.92%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2004
+val balanced accuracy: 99.89%, sensitivity: 99.89%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2008
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:23:06 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:23:10 - logger] - (main.py - 199): INFO - Train: [16/50][1/42]	lr 0.000032	 wd 0.0001	loss 0.2004 (0.2004)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:11 - logger] - (main.py - 199): INFO - Train: [16/50][6/42]	lr 0.000032	 wd 0.0001	loss 0.1995 (0.2000)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:13 - logger] - (main.py - 199): INFO - Train: [16/50][11/42]	lr 0.000032	 wd 0.0001	loss 0.1994 (0.2001)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:15 - logger] - (main.py - 199): INFO - Train: [16/50][16/42]	lr 0.000031	 wd 0.0001	loss 0.1995 (0.1999)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:17 - logger] - (main.py - 199): INFO - Train: [16/50][21/42]	lr 0.000031	 wd 0.0001	loss 0.2000 (0.1999)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:19 - logger] - (main.py - 199): INFO - Train: [16/50][26/42]	lr 0.000031	 wd 0.0001	loss 0.1994 (0.2001)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:20 - logger] - (main.py - 199): INFO - Train: [16/50][31/42]	lr 0.000031	 wd 0.0001	loss 0.1992 (0.2001)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:22 - logger] - (main.py - 199): INFO - Train: [16/50][36/42]	lr 0.000031	 wd 0.0001	loss 0.1990 (0.2000)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:24 - logger] - (main.py - 199): INFO - Train: [16/50][41/42]	lr 0.000031	 wd 0.0001	loss 0.1994 (0.2000)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:25 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:23:25 - logger] - (main.py - 214): INFO - EPOCH 16: train balanced accuracy 99.92% train takes 0:00:19
+[2026-03-17 23:23:25 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:23:36 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:23:36 - logger] - (main.py - 269): INFO - Test: 
+time 10.978	loss 0.2004	balanced accuracy 99.95%	mem 0MB
+[2026-03-17 23:23:36 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0169
+[2026-03-17 23:23:36 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:23:36 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:23:36 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:23:36 - logger] - (main.py - 127): INFO - Epoch: 016
+train balanced accuracy: 99.92%, sensitivity: 99.92%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2001
+val balanced accuracy: 99.95%, sensitivity: 99.95%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2004
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:23:36 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:23:39 - logger] - (main.py - 199): INFO - Train: [17/50][1/42]	lr 0.000031	 wd 0.0001	loss 0.2017 (0.2017)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:40 - logger] - (main.py - 199): INFO - Train: [17/50][6/42]	lr 0.000031	 wd 0.0001	loss 0.1993 (0.2001)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:42 - logger] - (main.py - 199): INFO - Train: [17/50][11/42]	lr 0.000031	 wd 0.0001	loss 0.1995 (0.1999)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:44 - logger] - (main.py - 199): INFO - Train: [17/50][16/42]	lr 0.000030	 wd 0.0001	loss 0.1993 (0.1997)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:46 - logger] - (main.py - 199): INFO - Train: [17/50][21/42]	lr 0.000030	 wd 0.0001	loss 0.1999 (0.1999)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:48 - logger] - (main.py - 199): INFO - Train: [17/50][26/42]	lr 0.000030	 wd 0.0001	loss 0.1994 (0.1998)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:49 - logger] - (main.py - 199): INFO - Train: [17/50][31/42]	lr 0.000030	 wd 0.0001	loss 0.1990 (0.1999)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:51 - logger] - (main.py - 199): INFO - Train: [17/50][36/42]	lr 0.000030	 wd 0.0001	loss 0.1992 (0.1998)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:53 - logger] - (main.py - 199): INFO - Train: [17/50][41/42]	lr 0.000030	 wd 0.0001	loss 0.1994 (0.1998)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:23:54 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:23:54 - logger] - (main.py - 214): INFO - EPOCH 17: train balanced accuracy 99.93% train takes 0:00:18
+[2026-03-17 23:23:54 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:24:05 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:24:05 - logger] - (main.py - 269): INFO - Test: 
+time 10.740	loss 0.2001	balanced accuracy 99.95%	mem 0MB
+[2026-03-17 23:24:05 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0169
+[2026-03-17 23:24:05 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:24:05 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:24:05 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:24:05 - logger] - (main.py - 127): INFO - Epoch: 017
+train balanced accuracy: 99.93%, sensitivity: 99.93%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1998
+val balanced accuracy: 99.95%, sensitivity: 99.95%, aucpr: 1.0000, auroc: 1.0000, loss: 0.2001
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:24:05 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:24:08 - logger] - (main.py - 199): INFO - Train: [18/50][1/42]	lr 0.000030	 wd 0.0001	loss 0.2007 (0.2007)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:10 - logger] - (main.py - 199): INFO - Train: [18/50][6/42]	lr 0.000030	 wd 0.0001	loss 0.1991 (0.1997)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:11 - logger] - (main.py - 199): INFO - Train: [18/50][11/42]	lr 0.000029	 wd 0.0001	loss 0.1992 (0.1996)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:13 - logger] - (main.py - 199): INFO - Train: [18/50][16/42]	lr 0.000029	 wd 0.0001	loss 0.1990 (0.1995)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:15 - logger] - (main.py - 199): INFO - Train: [18/50][21/42]	lr 0.000029	 wd 0.0001	loss 0.1991 (0.1994)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:17 - logger] - (main.py - 199): INFO - Train: [18/50][26/42]	lr 0.000029	 wd 0.0001	loss 0.1990 (0.1994)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:18 - logger] - (main.py - 199): INFO - Train: [18/50][31/42]	lr 0.000029	 wd 0.0001	loss 0.1992 (0.1994)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:20 - logger] - (main.py - 199): INFO - Train: [18/50][36/42]	lr 0.000029	 wd 0.0001	loss 0.2033 (0.1995)	balanced accuracy 98.00%	mem 0MB
+[2026-03-17 23:24:22 - logger] - (main.py - 199): INFO - Train: [18/50][41/42]	lr 0.000029	 wd 0.0001	loss 0.1994 (0.1996)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:23 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:24:23 - logger] - (main.py - 214): INFO - EPOCH 18: train balanced accuracy 99.95% train takes 0:00:18
+[2026-03-17 23:24:23 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:24:33 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:24:33 - logger] - (main.py - 269): INFO - Test: 
+time 10.420	loss 0.1999	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:33 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0166
+[2026-03-17 23:24:33 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:24:33 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:24:33 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:24:33 - logger] - (main.py - 127): INFO - Epoch: 018
+train balanced accuracy: 99.95%, sensitivity: 99.95%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1995
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1999
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:24:33 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:24:37 - logger] - (main.py - 199): INFO - Train: [19/50][1/42]	lr 0.000029	 wd 0.0001	loss 0.1992 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:38 - logger] - (main.py - 199): INFO - Train: [19/50][6/42]	lr 0.000028	 wd 0.0001	loss 0.1990 (0.1991)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:40 - logger] - (main.py - 199): INFO - Train: [19/50][11/42]	lr 0.000028	 wd 0.0001	loss 0.1996 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:41 - logger] - (main.py - 199): INFO - Train: [19/50][16/42]	lr 0.000028	 wd 0.0001	loss 0.1990 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:43 - logger] - (main.py - 199): INFO - Train: [19/50][21/42]	lr 0.000028	 wd 0.0001	loss 0.1992 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:45 - logger] - (main.py - 199): INFO - Train: [19/50][26/42]	lr 0.000028	 wd 0.0001	loss 0.1998 (0.1993)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:47 - logger] - (main.py - 199): INFO - Train: [19/50][31/42]	lr 0.000028	 wd 0.0001	loss 0.1996 (0.1993)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:48 - logger] - (main.py - 199): INFO - Train: [19/50][36/42]	lr 0.000028	 wd 0.0001	loss 0.1996 (0.1994)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:50 - logger] - (main.py - 199): INFO - Train: [19/50][41/42]	lr 0.000027	 wd 0.0001	loss 0.1998 (0.1994)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:24:51 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:24:51 - logger] - (main.py - 214): INFO - EPOCH 19: train balanced accuracy 100.00% train takes 0:00:17
+[2026-03-17 23:24:51 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:25:02 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:25:02 - logger] - (main.py - 269): INFO - Test: 
+time 10.716	loss 0.1997	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:02 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0166
+[2026-03-17 23:25:02 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:25:02 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:25:02 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:25:02 - logger] - (main.py - 127): INFO - Epoch: 019
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1994
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1997
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:25:02 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:25:05 - logger] - (main.py - 199): INFO - Train: [20/50][1/42]	lr 0.000027	 wd 0.0001	loss 0.1988 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:07 - logger] - (main.py - 199): INFO - Train: [20/50][6/42]	lr 0.000027	 wd 0.0001	loss 0.1990 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:08 - logger] - (main.py - 199): INFO - Train: [20/50][11/42]	lr 0.000027	 wd 0.0001	loss 0.1994 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:10 - logger] - (main.py - 199): INFO - Train: [20/50][16/42]	lr 0.000027	 wd 0.0001	loss 0.1992 (0.1991)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:12 - logger] - (main.py - 199): INFO - Train: [20/50][21/42]	lr 0.000027	 wd 0.0001	loss 0.1992 (0.1991)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:14 - logger] - (main.py - 199): INFO - Train: [20/50][26/42]	lr 0.000027	 wd 0.0001	loss 0.1990 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:15 - logger] - (main.py - 199): INFO - Train: [20/50][31/42]	lr 0.000027	 wd 0.0001	loss 0.1991 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:17 - logger] - (main.py - 199): INFO - Train: [20/50][36/42]	lr 0.000026	 wd 0.0001	loss 0.1995 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:19 - logger] - (main.py - 199): INFO - Train: [20/50][41/42]	lr 0.000026	 wd 0.0001	loss 0.1993 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:20 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:25:20 - logger] - (main.py - 214): INFO - EPOCH 20: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:25:20 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:25:30 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:25:30 - logger] - (main.py - 269): INFO - Test: 
+time 10.190	loss 0.1996	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:30 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0166
+[2026-03-17 23:25:30 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:25:30 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:25:30 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:25:30 - logger] - (main.py - 127): INFO - Epoch: 020
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1993
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1996
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:25:30 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:25:34 - logger] - (main.py - 199): INFO - Train: [21/50][1/42]	lr 0.000026	 wd 0.0001	loss 0.1992 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:35 - logger] - (main.py - 199): INFO - Train: [21/50][6/42]	lr 0.000026	 wd 0.0001	loss 0.1992 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:36 - logger] - (main.py - 199): INFO - Train: [21/50][11/42]	lr 0.000026	 wd 0.0001	loss 0.1990 (0.1991)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:38 - logger] - (main.py - 199): INFO - Train: [21/50][16/42]	lr 0.000026	 wd 0.0001	loss 0.1993 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:40 - logger] - (main.py - 199): INFO - Train: [21/50][21/42]	lr 0.000026	 wd 0.0001	loss 0.1989 (0.1991)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:42 - logger] - (main.py - 199): INFO - Train: [21/50][26/42]	lr 0.000026	 wd 0.0001	loss 0.1989 (0.1991)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:44 - logger] - (main.py - 199): INFO - Train: [21/50][31/42]	lr 0.000025	 wd 0.0001	loss 0.1989 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:45 - logger] - (main.py - 199): INFO - Train: [21/50][36/42]	lr 0.000025	 wd 0.0001	loss 0.1998 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:47 - logger] - (main.py - 199): INFO - Train: [21/50][41/42]	lr 0.000025	 wd 0.0001	loss 0.1990 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:25:48 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:25:48 - logger] - (main.py - 214): INFO - EPOCH 21: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:25:48 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:26:00 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:26:00 - logger] - (main.py - 269): INFO - Test: 
+time 11.289	loss 0.1994	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:00 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0163
+[2026-03-17 23:26:00 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:26:00 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:26:00 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:26:00 - logger] - (main.py - 127): INFO - Epoch: 021
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1992
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1994
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:26:00 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:26:03 - logger] - (main.py - 199): INFO - Train: [22/50][1/42]	lr 0.000025	 wd 0.0001	loss 0.1989 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:04 - logger] - (main.py - 199): INFO - Train: [22/50][6/42]	lr 0.000025	 wd 0.0001	loss 0.1989 (0.1990)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:06 - logger] - (main.py - 199): INFO - Train: [22/50][11/42]	lr 0.000025	 wd 0.0001	loss 0.1989 (0.1991)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:08 - logger] - (main.py - 199): INFO - Train: [22/50][16/42]	lr 0.000025	 wd 0.0001	loss 0.1988 (0.1990)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:10 - logger] - (main.py - 199): INFO - Train: [22/50][21/42]	lr 0.000024	 wd 0.0001	loss 0.1989 (0.1990)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:12 - logger] - (main.py - 199): INFO - Train: [22/50][26/42]	lr 0.000024	 wd 0.0001	loss 0.1989 (0.1991)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:14 - logger] - (main.py - 199): INFO - Train: [22/50][31/42]	lr 0.000024	 wd 0.0001	loss 0.1989 (0.1991)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:16 - logger] - (main.py - 199): INFO - Train: [22/50][36/42]	lr 0.000024	 wd 0.0001	loss 0.1990 (0.1991)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:17 - logger] - (main.py - 199): INFO - Train: [22/50][41/42]	lr 0.000024	 wd 0.0001	loss 0.1989 (0.1991)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:18 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:26:18 - logger] - (main.py - 214): INFO - EPOCH 22: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:26:18 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:26:30 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:26:30 - logger] - (main.py - 269): INFO - Test: 
+time 11.507	loss 0.1993	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:30 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0163
+[2026-03-17 23:26:30 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:26:30 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:26:30 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:26:30 - logger] - (main.py - 127): INFO - Epoch: 022
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1991
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1993
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:26:30 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:26:33 - logger] - (main.py - 199): INFO - Train: [23/50][1/42]	lr 0.000024	 wd 0.0001	loss 0.1988 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:34 - logger] - (main.py - 199): INFO - Train: [23/50][6/42]	lr 0.000024	 wd 0.0001	loss 0.1989 (0.1992)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:36 - logger] - (main.py - 199): INFO - Train: [23/50][11/42]	lr 0.000024	 wd 0.0001	loss 0.1992 (0.1991)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:38 - logger] - (main.py - 199): INFO - Train: [23/50][16/42]	lr 0.000023	 wd 0.0001	loss 0.1988 (0.1991)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:40 - logger] - (main.py - 199): INFO - Train: [23/50][21/42]	lr 0.000023	 wd 0.0001	loss 0.1989 (0.1990)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:41 - logger] - (main.py - 199): INFO - Train: [23/50][26/42]	lr 0.000023	 wd 0.0001	loss 0.1987 (0.1990)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:43 - logger] - (main.py - 199): INFO - Train: [23/50][31/42]	lr 0.000023	 wd 0.0001	loss 0.1989 (0.1990)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:45 - logger] - (main.py - 199): INFO - Train: [23/50][36/42]	lr 0.000023	 wd 0.0001	loss 0.1989 (0.1990)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:47 - logger] - (main.py - 199): INFO - Train: [23/50][41/42]	lr 0.000023	 wd 0.0001	loss 0.1988 (0.1990)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:48 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:26:48 - logger] - (main.py - 214): INFO - EPOCH 23: train balanced accuracy 100.00% train takes 0:00:17
+[2026-03-17 23:26:48 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:26:59 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:26:59 - logger] - (main.py - 269): INFO - Test: 
+time 10.669	loss 0.1992	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:26:59 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0162
+[2026-03-17 23:26:59 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:26:59 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:26:59 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:26:59 - logger] - (main.py - 127): INFO - Epoch: 023
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1990
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1992
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:26:59 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:27:02 - logger] - (main.py - 199): INFO - Train: [24/50][1/42]	lr 0.000023	 wd 0.0001	loss 0.1988 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:03 - logger] - (main.py - 199): INFO - Train: [24/50][6/42]	lr 0.000022	 wd 0.0001	loss 0.1990 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:05 - logger] - (main.py - 199): INFO - Train: [24/50][11/42]	lr 0.000022	 wd 0.0001	loss 0.1989 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:07 - logger] - (main.py - 199): INFO - Train: [24/50][16/42]	lr 0.000022	 wd 0.0001	loss 0.1992 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:08 - logger] - (main.py - 199): INFO - Train: [24/50][21/42]	lr 0.000022	 wd 0.0001	loss 0.1989 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:10 - logger] - (main.py - 199): INFO - Train: [24/50][26/42]	lr 0.000022	 wd 0.0001	loss 0.1988 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:12 - logger] - (main.py - 199): INFO - Train: [24/50][31/42]	lr 0.000022	 wd 0.0001	loss 0.1988 (0.1990)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:14 - logger] - (main.py - 199): INFO - Train: [24/50][36/42]	lr 0.000022	 wd 0.0001	loss 0.1989 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:15 - logger] - (main.py - 199): INFO - Train: [24/50][41/42]	lr 0.000021	 wd 0.0001	loss 0.1988 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:17 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:27:17 - logger] - (main.py - 214): INFO - EPOCH 24: train balanced accuracy 100.00% train takes 0:00:17
+[2026-03-17 23:27:17 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:27:27 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:27:27 - logger] - (main.py - 269): INFO - Test: 
+time 10.545	loss 0.1991	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:27 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0160
+[2026-03-17 23:27:27 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:27:27 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:27:27 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:27:27 - logger] - (main.py - 127): INFO - Epoch: 024
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1989
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1991
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:27:27 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:27:30 - logger] - (main.py - 199): INFO - Train: [25/50][1/42]	lr 0.000021	 wd 0.0001	loss 0.1990 (0.1990)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:32 - logger] - (main.py - 199): INFO - Train: [25/50][6/42]	lr 0.000021	 wd 0.0001	loss 0.1990 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:33 - logger] - (main.py - 199): INFO - Train: [25/50][11/42]	lr 0.000021	 wd 0.0001	loss 0.1988 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:35 - logger] - (main.py - 199): INFO - Train: [25/50][16/42]	lr 0.000021	 wd 0.0001	loss 0.1989 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:37 - logger] - (main.py - 199): INFO - Train: [25/50][21/42]	lr 0.000021	 wd 0.0001	loss 0.1989 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:39 - logger] - (main.py - 199): INFO - Train: [25/50][26/42]	lr 0.000021	 wd 0.0001	loss 0.1988 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:40 - logger] - (main.py - 199): INFO - Train: [25/50][31/42]	lr 0.000020	 wd 0.0001	loss 0.1988 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:42 - logger] - (main.py - 199): INFO - Train: [25/50][36/42]	lr 0.000020	 wd 0.0001	loss 0.1989 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:44 - logger] - (main.py - 199): INFO - Train: [25/50][41/42]	lr 0.000020	 wd 0.0001	loss 0.1988 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:45 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:27:45 - logger] - (main.py - 214): INFO - EPOCH 25: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:27:45 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:27:56 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:27:56 - logger] - (main.py - 269): INFO - Test: 
+time 10.985	loss 0.1991	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:27:56 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0159
+[2026-03-17 23:27:56 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:27:56 - logger] - (main.py - 124): INFO - Max performance: 0.00%
+[2026-03-17 23:27:56 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:27:56 - logger] - (main.py - 127): INFO - Epoch: 025
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1989
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1991
+test balanced accuracy: 0.00%, sensitivity: 0.00%, aucpr: 0.0000, auroc: 0.0000, loss: 0.0000
+
+[2026-03-17 23:27:56 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:27:59 - logger] - (main.py - 199): INFO - Train: [26/50][1/42]	lr 0.000020	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:01 - logger] - (main.py - 199): INFO - Train: [26/50][6/42]	lr 0.000020	 wd 0.0001	loss 0.1989 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:02 - logger] - (main.py - 199): INFO - Train: [26/50][11/42]	lr 0.000020	 wd 0.0001	loss 0.1988 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:04 - logger] - (main.py - 199): INFO - Train: [26/50][16/42]	lr 0.000020	 wd 0.0001	loss 0.1989 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:06 - logger] - (main.py - 199): INFO - Train: [26/50][21/42]	lr 0.000019	 wd 0.0001	loss 0.1988 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:08 - logger] - (main.py - 199): INFO - Train: [26/50][26/42]	lr 0.000019	 wd 0.0001	loss 0.1987 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:10 - logger] - (main.py - 199): INFO - Train: [26/50][31/42]	lr 0.000019	 wd 0.0001	loss 0.1999 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:11 - logger] - (main.py - 199): INFO - Train: [26/50][36/42]	lr 0.000019	 wd 0.0001	loss 0.1988 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:13 - logger] - (main.py - 199): INFO - Train: [26/50][41/42]	lr 0.000019	 wd 0.0001	loss 0.1987 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:14 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:28:14 - logger] - (main.py - 214): INFO - EPOCH 26: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:28:14 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:28:26 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:28:26 - logger] - (main.py - 269): INFO - Test: 
+time 11.301	loss 0.1990	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:26 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0157
+[2026-03-17 23:28:26 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:28:32 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:28:32 - logger] - (main.py - 269): INFO - Test: 
+time 6.084	loss 0.1990	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:32 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0157
+[2026-03-17 23:28:32 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:28:32 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:28:32 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:28:32 - logger] - (main.py - 127): INFO - Epoch: 026
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1990
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1990
+
+[2026-03-17 23:28:32 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:28:35 - logger] - (main.py - 199): INFO - Train: [27/50][1/42]	lr 0.000019	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:36 - logger] - (main.py - 199): INFO - Train: [27/50][6/42]	lr 0.000019	 wd 0.0001	loss 0.1995 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:38 - logger] - (main.py - 199): INFO - Train: [27/50][11/42]	lr 0.000019	 wd 0.0001	loss 0.1987 (0.1989)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:40 - logger] - (main.py - 199): INFO - Train: [27/50][16/42]	lr 0.000018	 wd 0.0001	loss 0.1987 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:42 - logger] - (main.py - 199): INFO - Train: [27/50][21/42]	lr 0.000018	 wd 0.0001	loss 0.1988 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:43 - logger] - (main.py - 199): INFO - Train: [27/50][26/42]	lr 0.000018	 wd 0.0001	loss 0.1987 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:45 - logger] - (main.py - 199): INFO - Train: [27/50][31/42]	lr 0.000018	 wd 0.0001	loss 0.1988 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:47 - logger] - (main.py - 199): INFO - Train: [27/50][36/42]	lr 0.000018	 wd 0.0001	loss 0.1988 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:49 - logger] - (main.py - 199): INFO - Train: [27/50][41/42]	lr 0.000018	 wd 0.0001	loss 0.1988 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:28:50 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:28:50 - logger] - (main.py - 214): INFO - EPOCH 27: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:28:50 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:29:00 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:29:00 - logger] - (main.py - 269): INFO - Test: 
+time 10.365	loss 0.1990	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:00 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0156
+[2026-03-17 23:29:00 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:29:06 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:29:06 - logger] - (main.py - 269): INFO - Test: 
+time 5.939	loss 0.1990	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:06 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0156
+[2026-03-17 23:29:06 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:29:06 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:29:06 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:29:06 - logger] - (main.py - 127): INFO - Epoch: 027
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1990
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1990
+
+[2026-03-17 23:29:06 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:29:09 - logger] - (main.py - 199): INFO - Train: [28/50][1/42]	lr 0.000018	 wd 0.0001	loss 0.1988 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:11 - logger] - (main.py - 199): INFO - Train: [28/50][6/42]	lr 0.000017	 wd 0.0001	loss 0.1988 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:13 - logger] - (main.py - 199): INFO - Train: [28/50][11/42]	lr 0.000017	 wd 0.0001	loss 0.1988 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:15 - logger] - (main.py - 199): INFO - Train: [28/50][16/42]	lr 0.000017	 wd 0.0001	loss 0.1986 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:16 - logger] - (main.py - 199): INFO - Train: [28/50][21/42]	lr 0.000017	 wd 0.0001	loss 0.1987 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:18 - logger] - (main.py - 199): INFO - Train: [28/50][26/42]	lr 0.000017	 wd 0.0001	loss 0.1988 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:20 - logger] - (main.py - 199): INFO - Train: [28/50][31/42]	lr 0.000017	 wd 0.0001	loss 0.1989 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:22 - logger] - (main.py - 199): INFO - Train: [28/50][36/42]	lr 0.000017	 wd 0.0001	loss 0.1987 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:23 - logger] - (main.py - 199): INFO - Train: [28/50][41/42]	lr 0.000016	 wd 0.0001	loss 0.1987 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:25 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:29:25 - logger] - (main.py - 214): INFO - EPOCH 28: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:29:25 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:29:35 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:29:35 - logger] - (main.py - 269): INFO - Test: 
+time 10.659	loss 0.1989	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:35 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0154
+[2026-03-17 23:29:35 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:29:41 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:29:41 - logger] - (main.py - 269): INFO - Test: 
+time 6.072	loss 0.1989	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:41 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0154
+[2026-03-17 23:29:41 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:29:41 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:29:41 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:29:41 - logger] - (main.py - 127): INFO - Epoch: 028
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1989
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1989
+
+[2026-03-17 23:29:41 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:29:44 - logger] - (main.py - 199): INFO - Train: [29/50][1/42]	lr 0.000016	 wd 0.0001	loss 0.1988 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:46 - logger] - (main.py - 199): INFO - Train: [29/50][6/42]	lr 0.000016	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:48 - logger] - (main.py - 199): INFO - Train: [29/50][11/42]	lr 0.000016	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:49 - logger] - (main.py - 199): INFO - Train: [29/50][16/42]	lr 0.000016	 wd 0.0001	loss 0.1988 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:51 - logger] - (main.py - 199): INFO - Train: [29/50][21/42]	lr 0.000016	 wd 0.0001	loss 0.1995 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:53 - logger] - (main.py - 199): INFO - Train: [29/50][26/42]	lr 0.000016	 wd 0.0001	loss 0.1988 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:55 - logger] - (main.py - 199): INFO - Train: [29/50][31/42]	lr 0.000015	 wd 0.0001	loss 0.1987 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:57 - logger] - (main.py - 199): INFO - Train: [29/50][36/42]	lr 0.000015	 wd 0.0001	loss 0.1987 (0.1988)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:58 - logger] - (main.py - 199): INFO - Train: [29/50][41/42]	lr 0.000015	 wd 0.0001	loss 0.1988 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:29:59 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:29:59 - logger] - (main.py - 214): INFO - EPOCH 29: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:29:59 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:30:11 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:30:11 - logger] - (main.py - 269): INFO - Test: 
+time 12.033	loss 0.1989	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:30:11 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0154
+[2026-03-17 23:30:11 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:30:18 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:30:18 - logger] - (main.py - 269): INFO - Test: 
+time 6.644	loss 0.1989	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:30:18 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0154
+[2026-03-17 23:30:18 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:30:18 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:30:18 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:30:18 - logger] - (main.py - 127): INFO - Epoch: 029
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1989
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1989
+
+[2026-03-17 23:30:18 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:30:22 - logger] - (main.py - 199): INFO - Train: [30/50][1/42]	lr 0.000015	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:30:23 - logger] - (main.py - 199): INFO - Train: [30/50][6/42]	lr 0.000015	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:30:25 - logger] - (main.py - 199): INFO - Train: [30/50][11/42]	lr 0.000015	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:30:27 - logger] - (main.py - 199): INFO - Train: [30/50][16/42]	lr 0.000015	 wd 0.0001	loss 0.1986 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:30:29 - logger] - (main.py - 199): INFO - Train: [30/50][21/42]	lr 0.000015	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:30:30 - logger] - (main.py - 199): INFO - Train: [30/50][26/42]	lr 0.000014	 wd 0.0001	loss 0.1989 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:30:32 - logger] - (main.py - 199): INFO - Train: [30/50][31/42]	lr 0.000014	 wd 0.0001	loss 0.1986 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:30:34 - logger] - (main.py - 199): INFO - Train: [30/50][36/42]	lr 0.000014	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:30:35 - logger] - (main.py - 199): INFO - Train: [30/50][41/42]	lr 0.000014	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:30:37 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:30:37 - logger] - (main.py - 214): INFO - EPOCH 30: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:30:37 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:30:47 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:30:47 - logger] - (main.py - 269): INFO - Test: 
+time 10.634	loss 0.1989	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:30:47 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0153
+[2026-03-17 23:30:47 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:30:53 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:30:53 - logger] - (main.py - 269): INFO - Test: 
+time 6.113	loss 0.1989	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:30:53 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0153
+[2026-03-17 23:30:53 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:30:53 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:30:53 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:30:53 - logger] - (main.py - 127): INFO - Epoch: 030
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1989
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1989
+
+[2026-03-17 23:30:53 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:30:57 - logger] - (main.py - 199): INFO - Train: [31/50][1/42]	lr 0.000014	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:30:58 - logger] - (main.py - 199): INFO - Train: [31/50][6/42]	lr 0.000014	 wd 0.0001	loss 0.1988 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:00 - logger] - (main.py - 199): INFO - Train: [31/50][11/42]	lr 0.000014	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:02 - logger] - (main.py - 199): INFO - Train: [31/50][16/42]	lr 0.000013	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:03 - logger] - (main.py - 199): INFO - Train: [31/50][21/42]	lr 0.000013	 wd 0.0001	loss 0.1989 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:05 - logger] - (main.py - 199): INFO - Train: [31/50][26/42]	lr 0.000013	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:07 - logger] - (main.py - 199): INFO - Train: [31/50][31/42]	lr 0.000013	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:09 - logger] - (main.py - 199): INFO - Train: [31/50][36/42]	lr 0.000013	 wd 0.0001	loss 0.1986 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:10 - logger] - (main.py - 199): INFO - Train: [31/50][41/42]	lr 0.000013	 wd 0.0001	loss 0.1988 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:11 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:31:11 - logger] - (main.py - 214): INFO - EPOCH 31: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:31:11 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:31:23 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:31:23 - logger] - (main.py - 269): INFO - Test: 
+time 11.261	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:23 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0151
+[2026-03-17 23:31:23 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:31:29 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:31:29 - logger] - (main.py - 269): INFO - Test: 
+time 6.248	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:29 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0151
+[2026-03-17 23:31:29 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:31:29 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:31:29 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:31:29 - logger] - (main.py - 127): INFO - Epoch: 031
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+
+[2026-03-17 23:31:29 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:31:32 - logger] - (main.py - 199): INFO - Train: [32/50][1/42]	lr 0.000013	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:34 - logger] - (main.py - 199): INFO - Train: [32/50][6/42]	lr 0.000013	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:35 - logger] - (main.py - 199): INFO - Train: [32/50][11/42]	lr 0.000012	 wd 0.0001	loss 0.1986 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:37 - logger] - (main.py - 199): INFO - Train: [32/50][16/42]	lr 0.000012	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:39 - logger] - (main.py - 199): INFO - Train: [32/50][21/42]	lr 0.000012	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:41 - logger] - (main.py - 199): INFO - Train: [32/50][26/42]	lr 0.000012	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:42 - logger] - (main.py - 199): INFO - Train: [32/50][31/42]	lr 0.000012	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:44 - logger] - (main.py - 199): INFO - Train: [32/50][36/42]	lr 0.000012	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:46 - logger] - (main.py - 199): INFO - Train: [32/50][41/42]	lr 0.000012	 wd 0.0001	loss 0.1986 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:47 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:31:47 - logger] - (main.py - 214): INFO - EPOCH 32: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:31:47 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:31:57 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:31:57 - logger] - (main.py - 269): INFO - Test: 
+time 10.401	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:31:57 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0150
+[2026-03-17 23:31:57 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:32:03 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:32:03 - logger] - (main.py - 269): INFO - Test: 
+time 5.937	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:03 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0150
+[2026-03-17 23:32:03 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:32:03 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:32:03 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:32:03 - logger] - (main.py - 127): INFO - Epoch: 032
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+
+[2026-03-17 23:32:03 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:32:07 - logger] - (main.py - 199): INFO - Train: [33/50][1/42]	lr 0.000012	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:08 - logger] - (main.py - 199): INFO - Train: [33/50][6/42]	lr 0.000011	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:10 - logger] - (main.py - 199): INFO - Train: [33/50][11/42]	lr 0.000011	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:12 - logger] - (main.py - 199): INFO - Train: [33/50][16/42]	lr 0.000011	 wd 0.0001	loss 0.1986 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:14 - logger] - (main.py - 199): INFO - Train: [33/50][21/42]	lr 0.000011	 wd 0.0001	loss 0.1986 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:16 - logger] - (main.py - 199): INFO - Train: [33/50][26/42]	lr 0.000011	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:18 - logger] - (main.py - 199): INFO - Train: [33/50][31/42]	lr 0.000011	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:20 - logger] - (main.py - 199): INFO - Train: [33/50][36/42]	lr 0.000011	 wd 0.0001	loss 0.1986 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:22 - logger] - (main.py - 199): INFO - Train: [33/50][41/42]	lr 0.000011	 wd 0.0001	loss 0.1988 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:23 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:32:23 - logger] - (main.py - 214): INFO - EPOCH 33: train balanced accuracy 100.00% train takes 0:00:19
+[2026-03-17 23:32:23 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:32:35 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:32:35 - logger] - (main.py - 269): INFO - Test: 
+time 12.567	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:35 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0149
+[2026-03-17 23:32:35 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:32:42 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:32:42 - logger] - (main.py - 269): INFO - Test: 
+time 6.767	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:42 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0149
+[2026-03-17 23:32:42 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:32:42 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:32:42 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:32:42 - logger] - (main.py - 127): INFO - Epoch: 033
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+
+[2026-03-17 23:32:42 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:32:45 - logger] - (main.py - 199): INFO - Train: [34/50][1/42]	lr 0.000010	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:47 - logger] - (main.py - 199): INFO - Train: [34/50][6/42]	lr 0.000010	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:49 - logger] - (main.py - 199): INFO - Train: [34/50][11/42]	lr 0.000010	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:51 - logger] - (main.py - 199): INFO - Train: [34/50][16/42]	lr 0.000010	 wd 0.0001	loss 0.1986 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:53 - logger] - (main.py - 199): INFO - Train: [34/50][21/42]	lr 0.000010	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:54 - logger] - (main.py - 199): INFO - Train: [34/50][26/42]	lr 0.000010	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:57 - logger] - (main.py - 199): INFO - Train: [34/50][31/42]	lr 0.000010	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:32:59 - logger] - (main.py - 199): INFO - Train: [34/50][36/42]	lr 0.000010	 wd 0.0001	loss 0.1989 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:33:00 - logger] - (main.py - 199): INFO - Train: [34/50][41/42]	lr 0.000009	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:33:01 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:33:01 - logger] - (main.py - 214): INFO - EPOCH 34: train balanced accuracy 100.00% train takes 0:00:19
+[2026-03-17 23:33:01 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:33:14 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:33:14 - logger] - (main.py - 269): INFO - Test: 
+time 12.141	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:33:14 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0149
+[2026-03-17 23:33:14 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:33:20 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:33:20 - logger] - (main.py - 269): INFO - Test: 
+time 6.321	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:33:20 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0148
+[2026-03-17 23:33:20 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:33:20 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:33:20 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:33:20 - logger] - (main.py - 127): INFO - Epoch: 034
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+
+[2026-03-17 23:33:20 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:33:23 - logger] - (main.py - 199): INFO - Train: [35/50][1/42]	lr 0.000009	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:33:24 - logger] - (main.py - 199): INFO - Train: [35/50][6/42]	lr 0.000009	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:33:26 - logger] - (main.py - 199): INFO - Train: [35/50][11/42]	lr 0.000009	 wd 0.0001	loss 0.1987 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:33:28 - logger] - (main.py - 199): INFO - Train: [35/50][16/42]	lr 0.000009	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:33:30 - logger] - (main.py - 199): INFO - Train: [35/50][21/42]	lr 0.000009	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:33:32 - logger] - (main.py - 199): INFO - Train: [35/50][26/42]	lr 0.000009	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:33:33 - logger] - (main.py - 199): INFO - Train: [35/50][31/42]	lr 0.000009	 wd 0.0001	loss 0.1986 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:33:35 - logger] - (main.py - 199): INFO - Train: [35/50][36/42]	lr 0.000009	 wd 0.0001	loss 0.1986 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:33:37 - logger] - (main.py - 199): INFO - Train: [35/50][41/42]	lr 0.000008	 wd 0.0001	loss 0.1986 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:33:38 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:33:38 - logger] - (main.py - 214): INFO - EPOCH 35: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:33:38 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:33:50 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:33:50 - logger] - (main.py - 269): INFO - Test: 
+time 11.833	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:33:50 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0148
+[2026-03-17 23:33:50 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:33:57 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:33:57 - logger] - (main.py - 269): INFO - Test: 
+time 6.272	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:33:57 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0148
+[2026-03-17 23:33:57 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:33:57 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:33:57 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:33:57 - logger] - (main.py - 127): INFO - Epoch: 035
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+
+[2026-03-17 23:33:57 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:34:00 - logger] - (main.py - 199): INFO - Train: [36/50][1/42]	lr 0.000008	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:01 - logger] - (main.py - 199): INFO - Train: [36/50][6/42]	lr 0.000008	 wd 0.0001	loss 0.1987 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:03 - logger] - (main.py - 199): INFO - Train: [36/50][11/42]	lr 0.000008	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:04 - logger] - (main.py - 199): INFO - Train: [36/50][16/42]	lr 0.000008	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:06 - logger] - (main.py - 199): INFO - Train: [36/50][21/42]	lr 0.000008	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:08 - logger] - (main.py - 199): INFO - Train: [36/50][26/42]	lr 0.000008	 wd 0.0001	loss 0.1987 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:10 - logger] - (main.py - 199): INFO - Train: [36/50][31/42]	lr 0.000008	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:12 - logger] - (main.py - 199): INFO - Train: [36/50][36/42]	lr 0.000008	 wd 0.0001	loss 0.1987 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:13 - logger] - (main.py - 199): INFO - Train: [36/50][41/42]	lr 0.000007	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:14 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:34:14 - logger] - (main.py - 214): INFO - EPOCH 36: train balanced accuracy 100.00% train takes 0:00:17
+[2026-03-17 23:34:14 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:34:26 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:34:26 - logger] - (main.py - 269): INFO - Test: 
+time 11.366	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:26 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0147
+[2026-03-17 23:34:26 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:34:32 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:34:32 - logger] - (main.py - 269): INFO - Test: 
+time 5.975	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:32 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0147
+[2026-03-17 23:34:32 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:34:32 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:34:32 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:34:32 - logger] - (main.py - 127): INFO - Epoch: 036
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1986
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+
+[2026-03-17 23:34:32 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:34:35 - logger] - (main.py - 199): INFO - Train: [37/50][1/42]	lr 0.000007	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:36 - logger] - (main.py - 199): INFO - Train: [37/50][6/42]	lr 0.000007	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:38 - logger] - (main.py - 199): INFO - Train: [37/50][11/42]	lr 0.000007	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:40 - logger] - (main.py - 199): INFO - Train: [37/50][16/42]	lr 0.000007	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:42 - logger] - (main.py - 199): INFO - Train: [37/50][21/42]	lr 0.000007	 wd 0.0001	loss 0.1987 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:43 - logger] - (main.py - 199): INFO - Train: [37/50][26/42]	lr 0.000007	 wd 0.0001	loss 0.1987 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:45 - logger] - (main.py - 199): INFO - Train: [37/50][31/42]	lr 0.000007	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:47 - logger] - (main.py - 199): INFO - Train: [37/50][36/42]	lr 0.000007	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:49 - logger] - (main.py - 199): INFO - Train: [37/50][41/42]	lr 0.000006	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:34:50 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:34:50 - logger] - (main.py - 214): INFO - EPOCH 37: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:34:50 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:35:01 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:35:01 - logger] - (main.py - 269): INFO - Test: 
+time 11.557	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:01 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0146
+[2026-03-17 23:35:01 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:35:08 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:35:08 - logger] - (main.py - 269): INFO - Test: 
+time 6.194	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:08 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0146
+[2026-03-17 23:35:08 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:35:08 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:35:08 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:35:08 - logger] - (main.py - 127): INFO - Epoch: 037
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1986
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+
+[2026-03-17 23:35:08 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:35:11 - logger] - (main.py - 199): INFO - Train: [38/50][1/42]	lr 0.000006	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:12 - logger] - (main.py - 199): INFO - Train: [38/50][6/42]	lr 0.000006	 wd 0.0001	loss 0.1987 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:14 - logger] - (main.py - 199): INFO - Train: [38/50][11/42]	lr 0.000006	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:16 - logger] - (main.py - 199): INFO - Train: [38/50][16/42]	lr 0.000006	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:18 - logger] - (main.py - 199): INFO - Train: [38/50][21/42]	lr 0.000006	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:20 - logger] - (main.py - 199): INFO - Train: [38/50][26/42]	lr 0.000006	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:22 - logger] - (main.py - 199): INFO - Train: [38/50][31/42]	lr 0.000006	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:24 - logger] - (main.py - 199): INFO - Train: [38/50][36/42]	lr 0.000006	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:26 - logger] - (main.py - 199): INFO - Train: [38/50][41/42]	lr 0.000006	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:27 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:35:27 - logger] - (main.py - 214): INFO - EPOCH 38: train balanced accuracy 100.00% train takes 0:00:19
+[2026-03-17 23:35:27 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:35:39 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:35:39 - logger] - (main.py - 269): INFO - Test: 
+time 11.886	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:39 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0146
+[2026-03-17 23:35:39 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:35:45 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:35:45 - logger] - (main.py - 269): INFO - Test: 
+time 6.105	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:45 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0146
+[2026-03-17 23:35:45 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:35:45 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:35:45 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:35:45 - logger] - (main.py - 127): INFO - Epoch: 038
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1986
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+
+[2026-03-17 23:35:45 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:35:48 - logger] - (main.py - 199): INFO - Train: [39/50][1/42]	lr 0.000006	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:50 - logger] - (main.py - 199): INFO - Train: [39/50][6/42]	lr 0.000005	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:52 - logger] - (main.py - 199): INFO - Train: [39/50][11/42]	lr 0.000005	 wd 0.0001	loss 0.1987 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:54 - logger] - (main.py - 199): INFO - Train: [39/50][16/42]	lr 0.000005	 wd 0.0001	loss 0.1987 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:56 - logger] - (main.py - 199): INFO - Train: [39/50][21/42]	lr 0.000005	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:58 - logger] - (main.py - 199): INFO - Train: [39/50][26/42]	lr 0.000005	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:35:59 - logger] - (main.py - 199): INFO - Train: [39/50][31/42]	lr 0.000005	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:36:01 - logger] - (main.py - 199): INFO - Train: [39/50][36/42]	lr 0.000005	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:36:03 - logger] - (main.py - 199): INFO - Train: [39/50][41/42]	lr 0.000005	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:36:04 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:36:04 - logger] - (main.py - 214): INFO - EPOCH 39: train balanced accuracy 100.00% train takes 0:00:19
+[2026-03-17 23:36:04 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:36:16 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:36:16 - logger] - (main.py - 269): INFO - Test: 
+time 11.328	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:36:16 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0145
+[2026-03-17 23:36:16 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:36:22 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:36:22 - logger] - (main.py - 269): INFO - Test: 
+time 6.685	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:36:22 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0145
+[2026-03-17 23:36:22 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:36:22 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:36:22 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:36:22 - logger] - (main.py - 127): INFO - Epoch: 039
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1986
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+
+[2026-03-17 23:36:22 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:36:25 - logger] - (main.py - 199): INFO - Train: [40/50][1/42]	lr 0.000005	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:36:27 - logger] - (main.py - 199): INFO - Train: [40/50][6/42]	lr 0.000005	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:36:29 - logger] - (main.py - 199): INFO - Train: [40/50][11/42]	lr 0.000005	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:36:31 - logger] - (main.py - 199): INFO - Train: [40/50][16/42]	lr 0.000004	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:36:33 - logger] - (main.py - 199): INFO - Train: [40/50][21/42]	lr 0.000004	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:36:34 - logger] - (main.py - 199): INFO - Train: [40/50][26/42]	lr 0.000004	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:36:36 - logger] - (main.py - 199): INFO - Train: [40/50][31/42]	lr 0.000004	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:36:38 - logger] - (main.py - 199): INFO - Train: [40/50][36/42]	lr 0.000004	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:36:40 - logger] - (main.py - 199): INFO - Train: [40/50][41/42]	lr 0.000004	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:36:41 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:36:41 - logger] - (main.py - 214): INFO - EPOCH 40: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:36:41 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:36:52 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:36:52 - logger] - (main.py - 269): INFO - Test: 
+time 11.113	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:36:52 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0145
+[2026-03-17 23:36:52 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:36:58 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:36:58 - logger] - (main.py - 269): INFO - Test: 
+time 6.474	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:36:58 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0145
+[2026-03-17 23:36:58 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:36:58 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:36:58 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:36:58 - logger] - (main.py - 127): INFO - Epoch: 040
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1986
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+
+[2026-03-17 23:36:58 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:37:02 - logger] - (main.py - 199): INFO - Train: [41/50][1/42]	lr 0.000004	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:03 - logger] - (main.py - 199): INFO - Train: [41/50][6/42]	lr 0.000004	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:05 - logger] - (main.py - 199): INFO - Train: [41/50][11/42]	lr 0.000004	 wd 0.0001	loss 0.1987 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:07 - logger] - (main.py - 199): INFO - Train: [41/50][16/42]	lr 0.000004	 wd 0.0001	loss 0.1987 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:09 - logger] - (main.py - 199): INFO - Train: [41/50][21/42]	lr 0.000004	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:11 - logger] - (main.py - 199): INFO - Train: [41/50][26/42]	lr 0.000003	 wd 0.0001	loss 0.1987 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:13 - logger] - (main.py - 199): INFO - Train: [41/50][31/42]	lr 0.000003	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:14 - logger] - (main.py - 199): INFO - Train: [41/50][36/42]	lr 0.000003	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:16 - logger] - (main.py - 199): INFO - Train: [41/50][41/42]	lr 0.000003	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:17 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:37:17 - logger] - (main.py - 214): INFO - EPOCH 41: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:37:17 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:37:28 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:37:28 - logger] - (main.py - 269): INFO - Test: 
+time 10.391	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:28 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0145
+[2026-03-17 23:37:28 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:37:33 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:37:33 - logger] - (main.py - 269): INFO - Test: 
+time 5.849	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:33 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0144
+[2026-03-17 23:37:33 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:37:33 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:37:33 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:37:33 - logger] - (main.py - 127): INFO - Epoch: 041
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1986
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+
+[2026-03-17 23:37:33 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:37:37 - logger] - (main.py - 199): INFO - Train: [42/50][1/42]	lr 0.000003	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:38 - logger] - (main.py - 199): INFO - Train: [42/50][6/42]	lr 0.000003	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:40 - logger] - (main.py - 199): INFO - Train: [42/50][11/42]	lr 0.000003	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:41 - logger] - (main.py - 199): INFO - Train: [42/50][16/42]	lr 0.000003	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:43 - logger] - (main.py - 199): INFO - Train: [42/50][21/42]	lr 0.000003	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:45 - logger] - (main.py - 199): INFO - Train: [42/50][26/42]	lr 0.000003	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:47 - logger] - (main.py - 199): INFO - Train: [42/50][31/42]	lr 0.000003	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:48 - logger] - (main.py - 199): INFO - Train: [42/50][36/42]	lr 0.000003	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:50 - logger] - (main.py - 199): INFO - Train: [42/50][41/42]	lr 0.000003	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:37:51 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:37:51 - logger] - (main.py - 214): INFO - EPOCH 42: train balanced accuracy 100.00% train takes 0:00:17
+[2026-03-17 23:37:51 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:38:02 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:38:02 - logger] - (main.py - 269): INFO - Test: 
+time 10.904	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:02 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0144
+[2026-03-17 23:38:02 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:38:08 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:38:08 - logger] - (main.py - 269): INFO - Test: 
+time 6.140	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:08 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0144
+[2026-03-17 23:38:08 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:38:08 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:38:08 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:38:08 - logger] - (main.py - 127): INFO - Epoch: 042
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1986
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+
+[2026-03-17 23:38:08 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:38:11 - logger] - (main.py - 199): INFO - Train: [43/50][1/42]	lr 0.000003	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:13 - logger] - (main.py - 199): INFO - Train: [43/50][6/42]	lr 0.000003	 wd 0.0001	loss 0.1987 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:15 - logger] - (main.py - 199): INFO - Train: [43/50][11/42]	lr 0.000002	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:16 - logger] - (main.py - 199): INFO - Train: [43/50][16/42]	lr 0.000002	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:18 - logger] - (main.py - 199): INFO - Train: [43/50][21/42]	lr 0.000002	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:20 - logger] - (main.py - 199): INFO - Train: [43/50][26/42]	lr 0.000002	 wd 0.0001	loss 0.1987 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:22 - logger] - (main.py - 199): INFO - Train: [43/50][31/42]	lr 0.000002	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:24 - logger] - (main.py - 199): INFO - Train: [43/50][36/42]	lr 0.000002	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:26 - logger] - (main.py - 199): INFO - Train: [43/50][41/42]	lr 0.000002	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:27 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:38:27 - logger] - (main.py - 214): INFO - EPOCH 43: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:38:27 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:38:38 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:38:38 - logger] - (main.py - 269): INFO - Test: 
+time 11.426	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:38 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0144
+[2026-03-17 23:38:38 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:38:45 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:38:45 - logger] - (main.py - 269): INFO - Test: 
+time 6.485	loss 0.1988	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:45 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0144
+[2026-03-17 23:38:45 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:38:45 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:38:45 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:38:45 - logger] - (main.py - 127): INFO - Epoch: 043
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1986
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1988
+
+[2026-03-17 23:38:45 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:38:48 - logger] - (main.py - 199): INFO - Train: [44/50][1/42]	lr 0.000002	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:49 - logger] - (main.py - 199): INFO - Train: [44/50][6/42]	lr 0.000002	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:51 - logger] - (main.py - 199): INFO - Train: [44/50][11/42]	lr 0.000002	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:53 - logger] - (main.py - 199): INFO - Train: [44/50][16/42]	lr 0.000002	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:55 - logger] - (main.py - 199): INFO - Train: [44/50][21/42]	lr 0.000002	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:57 - logger] - (main.py - 199): INFO - Train: [44/50][26/42]	lr 0.000002	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:38:58 - logger] - (main.py - 199): INFO - Train: [44/50][31/42]	lr 0.000002	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:39:00 - logger] - (main.py - 199): INFO - Train: [44/50][36/42]	lr 0.000002	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:39:02 - logger] - (main.py - 199): INFO - Train: [44/50][41/42]	lr 0.000002	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:39:03 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:39:03 - logger] - (main.py - 214): INFO - EPOCH 44: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:39:03 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:39:14 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:39:14 - logger] - (main.py - 269): INFO - Test: 
+time 10.829	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:39:14 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0144
+[2026-03-17 23:39:14 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:39:20 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:39:20 - logger] - (main.py - 269): INFO - Test: 
+time 5.881	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:39:20 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0144
+[2026-03-17 23:39:20 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:39:20 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:39:20 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:39:20 - logger] - (main.py - 127): INFO - Epoch: 044
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1986
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+
+[2026-03-17 23:39:20 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:39:23 - logger] - (main.py - 199): INFO - Train: [45/50][1/42]	lr 0.000002	 wd 0.0001	loss 0.1987 (0.1987)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:39:24 - logger] - (main.py - 199): INFO - Train: [45/50][6/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:39:26 - logger] - (main.py - 199): INFO - Train: [45/50][11/42]	lr 0.000001	 wd 0.0001	loss 0.1987 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:39:28 - logger] - (main.py - 199): INFO - Train: [45/50][16/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:39:30 - logger] - (main.py - 199): INFO - Train: [45/50][21/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:39:32 - logger] - (main.py - 199): INFO - Train: [45/50][26/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:39:33 - logger] - (main.py - 199): INFO - Train: [45/50][31/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:39:35 - logger] - (main.py - 199): INFO - Train: [45/50][36/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:39:37 - logger] - (main.py - 199): INFO - Train: [45/50][41/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:39:38 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:39:38 - logger] - (main.py - 214): INFO - EPOCH 45: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:39:38 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:39:50 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:39:50 - logger] - (main.py - 269): INFO - Test: 
+time 11.621	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:39:50 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0144
+[2026-03-17 23:39:50 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:39:56 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:39:56 - logger] - (main.py - 269): INFO - Test: 
+time 6.422	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:39:56 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0144
+[2026-03-17 23:39:56 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:39:56 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:39:56 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:39:56 - logger] - (main.py - 127): INFO - Epoch: 045
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1986
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+
+[2026-03-17 23:39:56 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:39:59 - logger] - (main.py - 199): INFO - Train: [46/50][1/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:01 - logger] - (main.py - 199): INFO - Train: [46/50][6/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:03 - logger] - (main.py - 199): INFO - Train: [46/50][11/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:04 - logger] - (main.py - 199): INFO - Train: [46/50][16/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:06 - logger] - (main.py - 199): INFO - Train: [46/50][21/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:08 - logger] - (main.py - 199): INFO - Train: [46/50][26/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:10 - logger] - (main.py - 199): INFO - Train: [46/50][31/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:12 - logger] - (main.py - 199): INFO - Train: [46/50][36/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:13 - logger] - (main.py - 199): INFO - Train: [46/50][41/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:14 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:40:14 - logger] - (main.py - 214): INFO - EPOCH 46: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:40:14 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:40:25 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:40:25 - logger] - (main.py - 269): INFO - Test: 
+time 10.700	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:25 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0144
+[2026-03-17 23:40:25 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:40:31 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:40:31 - logger] - (main.py - 269): INFO - Test: 
+time 5.964	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:31 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0143
+[2026-03-17 23:40:31 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:40:31 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:40:31 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:40:31 - logger] - (main.py - 127): INFO - Epoch: 046
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1986
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+
+[2026-03-17 23:40:31 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:40:34 - logger] - (main.py - 199): INFO - Train: [47/50][1/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:36 - logger] - (main.py - 199): INFO - Train: [47/50][6/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:38 - logger] - (main.py - 199): INFO - Train: [47/50][11/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:39 - logger] - (main.py - 199): INFO - Train: [47/50][16/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:41 - logger] - (main.py - 199): INFO - Train: [47/50][21/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:43 - logger] - (main.py - 199): INFO - Train: [47/50][26/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:45 - logger] - (main.py - 199): INFO - Train: [47/50][31/42]	lr 0.000001	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:47 - logger] - (main.py - 199): INFO - Train: [47/50][36/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:48 - logger] - (main.py - 199): INFO - Train: [47/50][41/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:40:50 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:40:50 - logger] - (main.py - 214): INFO - EPOCH 47: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:40:50 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:41:00 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:41:00 - logger] - (main.py - 269): INFO - Test: 
+time 10.813	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:00 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0143
+[2026-03-17 23:41:00 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:41:06 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:41:06 - logger] - (main.py - 269): INFO - Test: 
+time 6.048	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:06 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0143
+[2026-03-17 23:41:06 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:41:06 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:41:06 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:41:06 - logger] - (main.py - 127): INFO - Epoch: 047
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1986
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+
+[2026-03-17 23:41:06 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:41:10 - logger] - (main.py - 199): INFO - Train: [48/50][1/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:11 - logger] - (main.py - 199): INFO - Train: [48/50][6/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:13 - logger] - (main.py - 199): INFO - Train: [48/50][11/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:15 - logger] - (main.py - 199): INFO - Train: [48/50][16/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:16 - logger] - (main.py - 199): INFO - Train: [48/50][21/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:18 - logger] - (main.py - 199): INFO - Train: [48/50][26/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:20 - logger] - (main.py - 199): INFO - Train: [48/50][31/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:22 - logger] - (main.py - 199): INFO - Train: [48/50][36/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:24 - logger] - (main.py - 199): INFO - Train: [48/50][41/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:25 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:41:25 - logger] - (main.py - 214): INFO - EPOCH 48: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:41:25 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:41:37 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:41:37 - logger] - (main.py - 269): INFO - Test: 
+time 11.719	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:37 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0143
+[2026-03-17 23:41:37 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:41:43 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:41:43 - logger] - (main.py - 269): INFO - Test: 
+time 6.170	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:43 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0143
+[2026-03-17 23:41:43 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:41:43 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:41:43 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:41:43 - logger] - (main.py - 127): INFO - Epoch: 048
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1986
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+
+[2026-03-17 23:41:43 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:41:46 - logger] - (main.py - 199): INFO - Train: [49/50][1/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:48 - logger] - (main.py - 199): INFO - Train: [49/50][6/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:49 - logger] - (main.py - 199): INFO - Train: [49/50][11/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:51 - logger] - (main.py - 199): INFO - Train: [49/50][16/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:53 - logger] - (main.py - 199): INFO - Train: [49/50][21/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:55 - logger] - (main.py - 199): INFO - Train: [49/50][26/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:57 - logger] - (main.py - 199): INFO - Train: [49/50][31/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:41:58 - logger] - (main.py - 199): INFO - Train: [49/50][36/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:42:00 - logger] - (main.py - 199): INFO - Train: [49/50][41/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:42:01 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:42:01 - logger] - (main.py - 214): INFO - EPOCH 49: train balanced accuracy 100.00% train takes 0:00:18
+[2026-03-17 23:42:01 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:42:13 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:42:13 - logger] - (main.py - 269): INFO - Test: 
+time 11.472	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:42:13 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0143
+[2026-03-17 23:42:13 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:42:19 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:42:19 - logger] - (main.py - 269): INFO - Test: 
+time 6.244	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:42:19 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0143
+[2026-03-17 23:42:19 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:42:19 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:42:19 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:42:19 - logger] - (main.py - 127): INFO - Epoch: 049
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1986
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+
+[2026-03-17 23:42:19 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:42:22 - logger] - (main.py - 199): INFO - Train: [50/50][1/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:42:24 - logger] - (main.py - 199): INFO - Train: [50/50][6/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:42:25 - logger] - (main.py - 199): INFO - Train: [50/50][11/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:42:27 - logger] - (main.py - 199): INFO - Train: [50/50][16/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:42:29 - logger] - (main.py - 199): INFO - Train: [50/50][21/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:42:31 - logger] - (main.py - 199): INFO - Train: [50/50][26/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:42:32 - logger] - (main.py - 199): INFO - Train: [50/50][31/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:42:34 - logger] - (main.py - 199): INFO - Train: [50/50][36/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:42:36 - logger] - (main.py - 199): INFO - Train: [50/50][41/42]	lr 0.000000	 wd 0.0001	loss 0.1986 (0.1986)	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:42:37 - logger] - (main.py - 213): INFO - ------------------------------------------------------------
+[2026-03-17 23:42:37 - logger] - (main.py - 214): INFO - EPOCH 50: train balanced accuracy 100.00% train takes 0:00:17
+[2026-03-17 23:42:37 - logger] - (main.py - 217): INFO - ------------------------------------------------------------
+[2026-03-17 23:42:49 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:42:49 - logger] - (main.py - 269): INFO - Test: 
+time 11.869	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:42:49 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0143
+[2026-03-17 23:42:49 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:42:55 - logger] - (main.py - 268): INFO - ############################################################
+[2026-03-17 23:42:55 - logger] - (main.py - 269): INFO - Test: 
+time 6.414	loss 0.1987	balanced accuracy 100.00%	mem 0MB
+[2026-03-17 23:42:55 - logger] - (main.py - 289): INFO - XAI Frequency Band Contributions (Average Importance):
+  delta: 0.0143
+[2026-03-17 23:42:55 - logger] - (main.py - 291): INFO - ############################################################
+[2026-03-17 23:42:55 - logger] - (main.py - 124): INFO - Max performance: 100.00%
+[2026-03-17 23:42:55 - logger] - (main.py - 126): INFO - ********************************************************************************
+[2026-03-17 23:42:55 - logger] - (main.py - 127): INFO - Epoch: 050
+train balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1986
+val balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+test balanced accuracy: 100.00%, sensitivity: 100.00%, aucpr: 1.0000, auroc: 1.0000, loss: 0.1987
+
+[2026-03-17 23:42:55 - logger] - (main.py - 132): INFO - ********************************************************************************
+[2026-03-17 23:42:55 - logger] - (main.py - 146): INFO - Training time: 0:27:12
+[2026-03-17 23:42:55 - logger] - (main.py - 147): INFO - -------------------------------------- Done --------------------------------------

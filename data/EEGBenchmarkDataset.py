@@ -43,7 +43,7 @@ class EEGBenchmarkDataset(InMemoryDataset):
             final dataset. (default: :obj:`None`)
     """
 
-    names = ['TDBRAIN', 'TUAB']
+    names = ['TDBRAIN', 'TUAB', 'ds004504', 'BEED']
     split_dataset = ['train', 'val', 'test']
 
     def __init__(self, root, name, split='train', transform=None, pre_transform=None, pre_filter=None):
@@ -119,7 +119,7 @@ class EEGBenchmarkDataset(InMemoryDataset):
                 data = FreqbandData(x=torch.from_numpy(node_feat).to(torch.float32),
                                     edge_index=torch.cat(edge_index_list, dim=1).contiguous(),
                                     edge_attr=torch.from_numpy(edge_attr).to(torch.float32),
-                                    y=torch.from_numpy(label).to(torch.float32))
+                                    y=torch.from_numpy(label).reshape(1, -1).to(torch.float32))
                 # create frequency band order
                 # convert to correct index by freqband_order % self.num_nodes
                 data.freqband_order = freqband_order
