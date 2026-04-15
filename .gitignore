@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+
+# Environment
+.env
+*.yml.bak
+
+# Data (large files — keep structure, exclude generated data)
+EEGBenchmarkDataset/*/raw/
+EEGBenchmarkDataset/*/processed/
+
+# Training outputs
+output/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Misc
+*.log
