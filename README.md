@@ -307,6 +307,27 @@ The model also outputs **XAI frequency band contribution scores** — the averag
 
 ---
 
+## Explainable AI (XAI) & Clinical Interpretability
+
+To bridge the gap between deep learning and clinical neuroscience, we developed a comprehensive, post-hoc Explainable AI suite (`interpret_model.py`) that extracts the internal DeepLIFT attributions used by XAIguiFormer during training and maps them back to the 16 international 10-20 EEG electrode positions.
+
+The suite utilizes three distinct mathematical techniques (`Integrated Gradients`, `Saliency`, and `Occlusion/Feature Ablation`) via the PyTorch Captum library to guarantee the reliability of the derived feature importances. 
+
+### Cross-Method Agreement
+The visualization below proves the robustness of our interpretability layer. All three highly distinct mathematical methods independently converge on the exact same regions of the brain as the primary drivers of the model's diagnoses:
+![Method Agreement](assets/images/method_agreement.png)
+
+### Clinical Brain Topography Maps
+We map the raw node importance scores to a 2D spatial representation of the human scalp. This provides neurologists an intuitive, visual confirmation of the model's focus. For example, "Seizure Events" correctly isolate entirely to the Central Motor Cortex (C3/C4):
+![Brain Topography](assets/images/brain_topography.png)
+
+### Per-Class Feature Importance & Heatmaps
+By isolating the test samples by their true diagnosis (Healthy vs Focal vs Generalized), we extract the unique "brainwave signature" the transformer learned for each distinct brain disorder class:
+![Feature Heatmap](assets/images/feature_importance_heatmap.png)
+![Top Features](assets/images/per_class_feature_importance.png)
+
+---
+
 ## Citation
 
 If you find this work useful, please consider citing the original paper:
