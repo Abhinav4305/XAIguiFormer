@@ -15,10 +15,12 @@ This repository contains the implementation of **XAIguiFormer**, based on the IC
 - [Environment Setup](#environment-setup)
 - [Data Preparation](#data-preparation)
   - [BEED Dataset Preparation](#beed-dataset-preparation)
-  - [Other Datasets (TDBRAIN / TUAB / ds004504)](#other-datasets-tdbrain--tuab--ds004504)
+- [BEED Dataset Preparation](#beed-dataset-preparation)
 - [Training](#training)
 - [Configuration](#configuration)
 - [Evaluation Metrics](#evaluation-metrics)
+- [BEED Final Metrics](#beed-final-metrics)
+- [Explainable AI (XAI) & Clinical Interpretability](#explainable-ai-xai--clinical-interpretability)
 - [Citation](#citation)
 - [License](#license)
 
@@ -111,12 +113,7 @@ XAIguiFormer/
 ├── environment.yml                  # Conda environment specification
 │
 ├── configs/                         # Dataset-specific YAML configurations
-│   ├── BEED_model.yaml              # BEED: 4-class, 16 nodes, 1 freq band
-│   ├── TDBRAIN_model.yaml           # TDBRAIN config
-│   ├── TUAB_model.yaml              # TUAB config
-│   ├── ds004504_model.yaml          # ds004504 config
-│   ├── TDBRAIN_preprocess.yaml      # TDBRAIN preprocessing config
-│   └── TUAB_preprocess.yaml         # TUAB preprocessing config
+│   └── BEED_model.yaml              # BEED: 4-class, 16 nodes, 1 freq band
 │
 ├── models/
 │   └── XAIguiFormer.py              # Main model class
@@ -138,10 +135,6 @@ XAIguiFormer/
 │
 ├── utils/
 │   ├── prepare_BEED.py              # Convert BEED CSV → pseudo-connectome .npy files
-│   ├── prepare_ds004504.py          # Prepare ds004504 dataset
-│   ├── preprocessing.py             # Raw EEG preprocessing pipeline
-│   ├── constructFC.py               # Functional connectivity construction
-│   ├── transform_dataformAndlabel.py  # Data format & label transformations
 │   ├── eval_metrics.py              # BAC, Sensitivity, AUCPR, AUROC metrics
 │   └── visualizer.py               # Activation cache for XAI visualization
 │
@@ -235,20 +228,7 @@ conda install bytecode
 
 4. **First training run** will auto-generate `processed/*.pt` files via PyTorch Geometric's `InMemoryDataset`.
 
-### Other Datasets (TDBRAIN / TUAB / ds004504)
 
-For raw EEG datasets, create a separate MNE environment and run the preprocessing pipeline:
-
-```bash
-conda create -c conda-forge --strict-channel-priority --name=mne mne
-conda activate mne
-conda install -c conda-forge mne-connectivity mne-icalabel
-```
-
-1. Update paths in `configs/*_preprocess.yaml`
-2. Run preprocessing: `python utils/preprocessing.py`
-3. Construct connectomes: `python utils/constructFC.py`
-4. Organize files: `python utils/transform_dataformAndlabel.py`
 
 ---
 
@@ -259,14 +239,9 @@ Train the model by specifying the dataset name:
 ```bash
 # Train on BEED (4-class brainwave classification)
 python main.py --dataset BEED
-
-# Train on other supported datasets
-python main.py --dataset TDBRAIN
-python main.py --dataset TUAB
-python main.py --dataset ds004504
 ```
 
-Training outputs are saved to `output/results/<dataset>/`.
+Training outputs are saved to `output/results/BEED/`.
 
 ### Key BEED Training Configuration
 
@@ -304,6 +279,18 @@ The model is evaluated using the following metrics (computed via `torchmetrics`)
 Subject-level ensemble is performed during validation/test: predictions from all segments of the same subject are averaged before computing metrics.
 
 The model also outputs **XAI frequency band contribution scores** — the average absolute DeepLift attribution per frequency band — providing interpretable insights into which spectral components drive predictions.
+
+---
+
+## BEED Final Metrics
+
+Following training on the BEED Dataset for 50 Epochs, the system achieves the following baseline validation metrics:
+
+| Split | Balanced Accuracy | Sensitivity | AUCPR | AUROC | Initial Loss |
+|---|---|---|---|---|---|
+| **Train** | 93.49% | 90.29% | 0.9567 | 0.9842 | 0.5592 |
+| **Validation** | 84.12% | 76.19% | 0.7875 | 0.9057 | 0.8924 |
+| **Test** | **84.58%** | **76.88%** | **0.8072** | **0.9262** | 0.8200 |
 
 ---
 
